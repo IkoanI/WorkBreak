@@ -1,0 +1,145 @@
+.footer {
+  background: linear-gradient(to right, #e5e7eb, #d1d5db);
+  border-top: 1px solid #d1d5db;
+  box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.1);
+  margin-top: 20px;
+
+}
+
+.footer-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem 1rem;
+}
+
+.footer-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 2rem;
+}
+
+@media (min-width: 768px) {
+  .footer-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.footer-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.logo-section {
+  align-items: center;
+}
+
+
+.logo-section,
+.links-section,
+.contact-section {
+  align-items: center;
+  text-align: center;
+}
+
+@media (min-width: 768px) {
+  .logo-section,
+  .links-section,
+  .contact-section {
+    align-items: flex-start;
+    text-align: left;
+  }
+}
+
+.footer-logo-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.footer-logo {
+  border-radius: 9999px;
+}
+
+.footer-logo-text {
+  color: #047857;
+  font-weight: bold;
+  font-size: 1.125rem;
+}
+
+.footer-description {
+  color: #4b5563;
+  font-size: 0.875rem;
+  text-align: center;
+}
+
+.links-section {
+  align-items: center;
+}
+
+.footer-heading {
+  color: #047857;
+  font-weight: 600;
+  font-size: 1.125rem;
+  margin-bottom: 1rem;
+}
+
+.footer-links {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.footer-link {
+  color: #374151;
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+.footer-link:hover {
+  color: #047857;
+}
+
+.contact-list {
+  display: grid;
+  gap: 0.5rem;
+}
+
+.contact-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.contact-icon {
+  width: 1.5rem;
+  height: 1.5rem;
+  border-radius: 9999px;
+  background-color: #047857;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.contact-initial {
+  color: white;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.contact-name {
+  color: #374151;
+}
+
+.footer-bottom {
+  margin-top: 2rem;
+  padding-top: 1rem;
+  border-top: 1px solid #d1d5db;
+  text-align: center;
+  color: #6b7280;
+  font-size: 0.875rem;
+}

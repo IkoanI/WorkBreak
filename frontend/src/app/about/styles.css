@@ -1,0 +1,22 @@
+.about-container {
+  max-width: 768px;
+  margin: 0 auto;
+  padding: 1.5rem;
+  background-color: #d1ddd0;  
+  border-radius: 0.5rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  color: #374151; 
+}
+
+.about-heading {
+  font-size: 2rem;
+  font-weight: bold;
+  color: #047857;  
+  margin-bottom: 1rem;
+}
+
+.about-paragraph {
+  margin-bottom: 1rem;
+  font-size: 1rem;
+  line-height: 1.6;
+}
