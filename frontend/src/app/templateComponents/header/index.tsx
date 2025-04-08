@@ -25,11 +25,11 @@ export default function Header() {
           <div className = "desktop-nav">
             <nav>
               <ul className = "nav-links">
-                <li><a href = "#" className="nav-link"> Home </a></li>
-                <li><a href = "#" className="nav-link"> About </a></li>
+                <li><a href = "/home" className="nav-link"> Home </a></li>
+                <li><a href = "/about" className="nav-link"> About </a></li>
               </ul>
             </nav>
-            <a href = "/login" className = "login-button">
+            <a href = "/accounts/login" className = "login-button">
               <span> Login </span>
             </a>
           </div>
@@ -45,7 +45,7 @@ export default function Header() {
           <nav>
             <ul className = "mobile-links">
               <li><a href = "#" className="mobile-link"> Home </a></li>
-              <li><a href = "#" className="mobile-link"> About </a></li>
+              <li><a href = "/about" className="mobile-link"> About </a></li>
             </ul>
           </nav>
           <a href = "/login" className = "login-button mobile-login">
