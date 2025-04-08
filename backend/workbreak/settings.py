@@ -38,7 +38,9 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django_nextjs.apps.DjangoNextJSConfig',
-    'workbreak'
+    'workbreak',
+    'accounts',
+    'home'
 ]
 
 MIDDLEWARE = [
