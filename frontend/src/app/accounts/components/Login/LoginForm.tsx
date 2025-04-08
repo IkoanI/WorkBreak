@@ -9,6 +9,7 @@ import "./LoginForm.css";
 export default function LoginForm() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const [errors, setErrors] = useState();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -28,10 +29,11 @@ export default function LoginForm() {
     if (response.ok) {
       redirect('/');
     } else {
-      alert(JSON.stringify(data));
+      setErrors(data);
     }
   };
 
+  // ERROR MESSAGE NEEDS STYLING
   return (
     <div className = "login-container">
       <div className = "login-brand">
@@ -41,6 +43,7 @@ export default function LoginForm() {
       <h1 className = "login-title"> Welcome Back </h1>
 
       <form onSubmit = {handleSubmit} className = "login-form">
+        {errors != undefined && errors["error"] && <p>{errors["error"]}</p>}
         <LoginInput
           label = "Username:"
           type = "text"
