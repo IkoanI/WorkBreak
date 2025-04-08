@@ -23,9 +23,10 @@ const center = {
 export default function RouteMap({ destination }: Props) {
     // load the google maps api
   const { isLoaded, loadError } = useJsApiLoader({
-    googleMapsApiKey: process.env.GOOGLE_MAPS_API_KEY!,
+    googleMapsApiKey: process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY!,
     libraries: ['places'],
   });
+  
 
   // hold map instance
   const [map, setMap] = useState<google.maps.Map | null>(null);
