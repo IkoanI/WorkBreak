@@ -1,7 +1,10 @@
 from django.urls import path
 from . import views
+from django_nextjs.views import nextjs_page
 urlpatterns = [
-    path('signup', views.signup, name='accounts.signup'),
-    path('login/', views.login, name='accounts.login'),
+    path('signup', nextjs_page(), name='accounts.signup'),
+    path('api/signup', views.signup, name='accounts.api.signup'),
+    path('login', nextjs_page(), name='accounts.login'),
+    path('api/login', views.login, name='accounts.api.login'),
     path('logout/', views.logout, name='accounts.logout'),
 ]

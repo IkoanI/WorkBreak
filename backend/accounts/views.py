@@ -1,45 +1,37 @@
 from django.shortcuts import render
-from django.contrib.auth.forms import UserCreationForm
 from django.shortcuts import redirect
 from django.contrib.auth import login as auth_login, authenticate, logout as auth_logout
 from django.contrib.auth.decorators import login_required
+from django.http import JsonResponse
+import json
+from .forms import CustomUserCreationForm
 # Create your views here.
 def signup(request):
-    template_data = {}
-    template_data['title'] = 'Sign Up'
-    if request.method == 'GET':
-        template_data['form'] = UserCreationForm()
-        return render(request, 'accounts/signup.html',
-            {'template_data': template_data})
-    elif request.method == 'POST':
-        form = UserCreationForm(request.POST)
+    if request.method == 'POST':
+        data = json.loads(request.body)
+        form = CustomUserCreationForm(data)
         if form.is_valid():
             form.save()
-            return redirect('accounts.login')
+            return JsonResponse({'message': 'User created successfully'}, status=201)
         else:
-            template_data['form'] = form
-            return render(request, 'accounts/signup.html',
-                          {'template_data': template_data})
+            return JsonResponse(form.errors, status=400)
+
+    return JsonResponse({'error': 'Invalid request method'}, status=405)
 
 def login(request):
-    template_data = {}
-    template_data['title'] = 'Login'
-    if request.method == 'GET':
-        return render(request, 'accounts/login.html',
-            {'template_data': template_data})
-    elif request.method == 'POST':
+    if request.method == 'POST':
+        data = json.loads(request.body)
+        print(json.dumps(data, indent=4))
         user = authenticate(
             request,
-            username = request.POST['username'],
-            password = request.POST['password']
+            username = data['username'],
+            password = data['password']
         )
         if user is None:
-            template_data['error'] = 'The username or password is incorrect.'
-            return render(request, 'accounts/login.html',
-                {'template_data': template_data})
+            return JsonResponse({'error': 'Invalid username or password'}, status=401)
         else:
             auth_login(request, user)
-            return redirect('home.index')
+            return JsonResponse({'message': 'Login Successful'}, status=200)
 
 @login_required
 def logout(request):
