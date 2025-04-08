@@ -1,4 +1,4 @@
-import RouteMap from '@/app/components/RouteMap';
+import RouteMap from '@/app/components/map/RouteMap';
 
 export default function TESTPage() {
     const mcdonaldsLocation = {
