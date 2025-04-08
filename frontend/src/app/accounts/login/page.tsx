@@ -1,4 +1,4 @@
-import LoginForm from '../../components/login-signup/LoginForm'
+import LoginForm from '../components/Login/LoginForm'
 export default function Page() {
     return (
         <div>
