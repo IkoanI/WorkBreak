@@ -14,6 +14,7 @@ export default function Header() {
   const [username, setUsername] = useState();
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
+  /* kinda scuffed fix later */
   useEffect(() => {
     async function fetchUser() {
       const response = await fetch('/accounts/api/check_auth');
@@ -47,7 +48,7 @@ export default function Header() {
             <div className="desktop-nav">
               <nav>
                 <ul className="nav-links">
-                  <li><a href="/" className="nav-link"> Home </a></li>
+                  <li><a href="/home" className="nav-link"> Home </a></li>
                   <li><a href="/about" className="nav-link"> About </a></li>
                 </ul>
               </nav>
