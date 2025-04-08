@@ -37,3 +37,7 @@ def login(request):
 def logout(request):
     auth_logout(request)
     return redirect('home.index')
+
+@login_required
+def check_auth(request):
+    return JsonResponse({'username': request.user.username}, status=200)

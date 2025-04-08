@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { getCookie } from 'typescript-cookie';
 import { redirect } from "next/navigation";
 import LoginInput from "./LoginInput";
@@ -26,7 +26,6 @@ export default function LoginForm() {
     const data = await response.json();
 
     if (response.ok) {
-      alert(data.message);
       redirect('/');
     } else {
       alert(JSON.stringify(data));

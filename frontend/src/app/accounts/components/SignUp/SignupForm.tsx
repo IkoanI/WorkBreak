@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { getCookie } from 'typescript-cookie';
 import { redirect } from "next/navigation";
 import SignupInput from "./SignupInput";

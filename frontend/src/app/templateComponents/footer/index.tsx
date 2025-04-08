@@ -28,7 +28,7 @@ export default function Footer() {
             <h3 className = "footer-heading"> Quick Links </h3>
             <nav>
               <ul className = "footer-links">
-                <li><Link href = "/home" className = "footer-link"> Home </Link></li>
+                <li><Link href = "/" className = "footer-link"> Home </Link></li>
                 <li><Link href = "/about" className = "footer-link"> About </Link></li>
                 <li><Link href = "/accounts/login" className = "footer-link"> Login </Link></li>
               </ul>
