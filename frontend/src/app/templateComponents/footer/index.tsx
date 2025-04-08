@@ -8,7 +8,6 @@ export default function Footer() {
     <footer className = "footer">
       <div className = "footer-container">
         <div className = "footer-grid">
-          {/* Logo and About */}
           <div className = "footer-section logo-section">
             <div className = "footer-logo-wrapper">
               <Image
@@ -25,20 +24,18 @@ export default function Footer() {
             </p>
           </div>
 
-          {/* Quick Links */}
           <div className = "footer-section links-section">
             <h3 className = "footer-heading"> Quick Links </h3>
             <nav>
               <ul className = "footer-links">
-                <li><Link href = "#" className="footer-link"> Home </Link></li>
-                <li><Link href = "#" className="footer-link"> About </Link></li>
-                <li><Link href = "/login" className="footer-link"> Login </Link></li>
+                <li><Link href = "/home" className = "footer-link"> Home </Link></li>
+                <li><Link href = "/about" className = "footer-link"> About </Link></li>
+                <li><Link href = "/accounts/login" className = "footer-link"> Login </Link></li>
               </ul>
             </nav>
           </div>
 
-          {/* Contact Us */}
-          <div className = "footer-section contact-section">
+          <div className = "footer-section-contact-section">
             <h3 className = "footer-heading"> Contact Us </h3>
             <div className = "contact-list">
               {["Alina", "Daksh", "Elvis", "Koan", "Steve"].map((name) => (
