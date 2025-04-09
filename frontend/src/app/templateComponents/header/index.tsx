@@ -31,7 +31,7 @@ export default function Header() {
                 <li><a href = "/about" className="nav-link"> About </a></li>
               </ul>
             </nav>
-            <a href = "/login" className = "login-button">
+            <a href = "/accounts/login" className = "login-button">
               <span> Login </span>
             </a>
           </div>
