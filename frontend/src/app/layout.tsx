@@ -1,3 +1,5 @@
+'use client';
+
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 
@@ -5,6 +7,25 @@ import "./globals.css";
 import Head from "./templateComponents/head/head";
 import Footer from "./templateComponents/footer";
 import Header from "./templateComponents/header";
+
+import {createContext, useState} from 'react';
+
+export type User = {
+    isAuthenticated: boolean
+    username: string
+}
+
+export type UserContextType = {
+  user: User
+  setUser:(x: User) => void
+}
+
+const UserContext = createContext<UserContextType>(
+    {
+        user: {username : "placeholder", isAuthenticated: false},
+        setUser: () => {},
+    }
+)
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -21,17 +42,22 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+
+    const [user, setUser] = useState({username : "placeholder", isAuthenticated: false});
+    
   return (
     <html lang="en">
       <Head />
-
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
-        
-        <Header />
-        {children}
-        <Footer />
-
+        <UserContext.Provider value={{user : user, setUser : setUser}}>
+          <Header />
+          {children}
+          <Footer />
+        </UserContext.Provider>
       </body>
     </html>
   );
 }
+
+//dont ask why it just works
+export { UserContext }

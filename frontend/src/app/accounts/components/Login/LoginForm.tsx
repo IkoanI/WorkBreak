@@ -1,14 +1,17 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, {useState, useContext} from 'react';
 import { getCookie } from 'typescript-cookie';
 import { redirect } from "next/navigation";
 import LoginInput from "./LoginInput";
 import "./LoginForm.css";
+import {UserContext} from "@/app/layout";
 
 export default function LoginForm() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const [errors, setErrors] = useState();
+  const { setUser } = useContext(UserContext);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -26,12 +29,17 @@ export default function LoginForm() {
     const data = await response.json();
 
     if (response.ok) {
+      setUser({
+        username: username,
+        isAuthenticated: true
+      })
       redirect('/');
     } else {
-      alert(JSON.stringify(data));
+      setErrors(data);
     }
   };
 
+  // ERROR MESSAGE NEEDS STYLING
   return (
     <div className = "login-container">
       <div className = "login-brand">
@@ -41,6 +49,7 @@ export default function LoginForm() {
       <h1 className = "login-title"> Welcome Back </h1>
 
       <form onSubmit = {handleSubmit} className = "login-form">
+        {errors != undefined && errors["error"] && <p>{errors["error"]}</p>}
         <LoginInput
           label = "Username:"
           type = "text"

@@ -1,4 +1,3 @@
-from django.shortcuts import render
 from django.shortcuts import redirect
 from django.contrib.auth import login as auth_login, authenticate, logout as auth_logout
 from django.contrib.auth.decorators import login_required

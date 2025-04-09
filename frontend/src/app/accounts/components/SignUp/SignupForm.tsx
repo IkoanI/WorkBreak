@@ -15,6 +15,7 @@ export default function SignupForm() {
   const [password1, setPassword1] = useState('');
   const [password2, setPassword2] = useState('');
   const [email, setEmail] = useState('');
+  const [errors, setErrors] = useState();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -32,13 +33,13 @@ export default function SignupForm() {
     const data = await response.json();
 
     if (response.ok) {
-      alert(data.message);
       redirect('/accounts/login');
     } else {
-      alert(JSON.stringify(data));
+      setErrors(data);
     }
   };
 
+  // ERROR MESSAGES NEED STYLING
   return (
     <div className = "signup-container">
       <div className = "signup-brand">
@@ -48,24 +49,31 @@ export default function SignupForm() {
       <h1 className = "signup-title"> Create Your Account </h1>
 
       <form onSubmit = {handleSubmit} className = "signup-form">
+        {errors != undefined && errors["username"] && <p>{errors["username"]}</p>}
         <SignupInput
           label = "Username:"
           type = "text"
           value = {username}
           onChange = {(e) => setUsername(e.target.value)}
         />
+
+        {errors != undefined && errors["email"] && <p>{errors["email"]}</p>}
         <SignupInput
           label = "Email:"
           type= " email"
           value = {email}
           onChange = {(e) => setEmail(e.target.value)}
         />
+
+        {errors != undefined && errors["password1"] && <p>{errors["password1"]}</p>}
         <SignupInput
           label = "Password:"
           type = "password"
           value = {password1}
           onChange = {(e) => setPassword1(e.target.value)}
         />
+
+        {errors != undefined && errors["password2"] && <p>{errors["password2"]}</p>}
         <SignupInput
           label = "Confirm Password:"
           type = "password"
