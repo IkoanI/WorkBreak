@@ -32,29 +32,43 @@ export default function RouteMap({ destination }: Props) {
   const [map, setMap] = useState<google.maps.Map | null>(null);
 
   // get directions
-  useEffect(() => {
-    if (!isLoaded || !map) return;
+  // get directions once map + api are ready
+useEffect(() => {
+  if (!isLoaded || !map) return;
 
-    const directionsService = new google.maps.DirectionsService();
-    const directionsRenderer = new google.maps.DirectionsRenderer();
-    directionsRenderer.setMap(map);
+  navigator.geolocation.getCurrentPosition(
+    (position) => {
+      const userLocation = {
+        lat: position.coords.latitude,
+        lng: position.coords.longitude,
+      };
 
-    directionsService.route(
-      {
-        // TODO; make this dynamic (adjust to user loc)
-        origin: 'Atlanta, GA', 
-        destination: destination,
-        travelMode: google.maps.TravelMode.DRIVING,
-      },
-      (result, status) => {
-        if (status === 'OK' && result) {
-          directionsRenderer.setDirections(result);
-        } else {
-          console.error('Directions request failed due to ', status);
+      map.setCenter(userLocation); // center the map to user
+
+      const directionsService = new google.maps.DirectionsService();
+      const directionsRenderer = new google.maps.DirectionsRenderer();
+      directionsRenderer.setMap(map);
+
+      directionsService.route(
+        {
+          origin: userLocation,
+          destination: destination,
+          travelMode: google.maps.TravelMode.DRIVING,
+        },
+        (result, status) => {
+          if (status === 'OK' && result) {
+            directionsRenderer.setDirections(result);
+          } else {
+            console.error('Directions request failed due to ', status);
+          }
         }
-      }
-    );
-  }, [isLoaded, map, destination]);
+      );
+    },
+    (error) => {
+      console.error('Geolocation failed:', error);
+    }
+  );
+}, [isLoaded, map, destination]);
 
   // error handling
   if (loadError) return <div>Error loading maps</div>;

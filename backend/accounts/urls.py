@@ -7,4 +7,5 @@ urlpatterns = [
     path('login', nextjs_page(), name='accounts.login'),
     path('api/login', views.login, name='accounts.api.login'),
     path('logout/', views.logout, name='accounts.logout'),
+    path('api/check_auth', views.check_auth, name='accounts.api.check_auth'),
 ]

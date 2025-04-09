@@ -1,4 +1,3 @@
-from django.shortcuts import render
 from django.shortcuts import redirect
 from django.contrib.auth import login as auth_login, authenticate, logout as auth_logout
 from django.contrib.auth.decorators import login_required
@@ -37,3 +36,7 @@ def login(request):
 def logout(request):
     auth_logout(request)
     return redirect('home.index')
+
+@login_required
+def check_auth(request):
+    return JsonResponse({'username': request.user.username}, status=200)
