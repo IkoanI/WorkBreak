@@ -6,6 +6,7 @@ import { redirect } from "next/navigation";
 import LoginInput from "./LoginInput";
 import "./LoginForm.css";
 import {useAppContext} from "@/app/AppContext";
+import Link from "next/link";
 
 export default function LoginForm() {
   const [username, setUsername] = useState('');
@@ -61,7 +62,7 @@ export default function LoginForm() {
         />
 
         <div className = "login-forgot">
-          <a href = "#" className = "login-link">
+          <a href = "/accounts/password_reset/" className = "login-link">
             Forgot password?
           </a>
         </div>
@@ -75,9 +76,9 @@ export default function LoginForm() {
         <p>
           Don&#39;t have an account?{" "}
 
-          <a href = "/accounts/signup" className = "login-link">
+          <Link href = "/accounts/signup" className = "login-link">
             Sign up
-          </a>
+          </Link>
         </p>
       </div>
     </div>
