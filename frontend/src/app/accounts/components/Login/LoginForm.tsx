@@ -1,17 +1,17 @@
 'use client';
 
-import React, {useState, useContext} from 'react';
+import React, {useContext, useState} from 'react';
 import { getCookie } from 'typescript-cookie';
 import { redirect } from "next/navigation";
 import LoginInput from "./LoginInput";
 import "./LoginForm.css";
-import {UserContext} from "@/app/layout";
+import {useAppContext} from "@/app/AppContext";
 
 export default function LoginForm() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [errors, setErrors] = useState();
-  const { setUser } = useContext(UserContext);
+  const { setUser } = useAppContext()
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -29,11 +29,8 @@ export default function LoginForm() {
     const data = await response.json();
 
     if (response.ok) {
-      setUser({
-        username: username,
-        isAuthenticated: true
-      })
-      redirect('/');
+      setUser({username: username, isAuthenticated: true})
+      redirect('/home');
     } else {
       setErrors(data);
     }
@@ -76,7 +73,8 @@ export default function LoginForm() {
 
       <div className = "login-footer">
         <p>
-          Don't have an account?{" "}
+          Don&#39;t have an account?{" "}
+
           <a href = "/accounts/signup" className = "login-link">
             Sign up
           </a>

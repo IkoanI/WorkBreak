@@ -1,13 +1,12 @@
 "use client";
 
-import React, {useContext, useState} from 'react';
+import React, {useState} from 'react';
 import Image from 'next/image';
 import './styles.css';
-import { UserContext } from '../../layout';
-
+import LoginButton from "@/app/templateComponents/header/LoginButton";
+import Link from "next/link";
 export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const { user } = useContext(UserContext);
 
   return (
       <header className = "header">
@@ -28,13 +27,12 @@ export default function Header() {
               <nav>
 
                 <ul className = "nav-links">
-                  <li><a href = "/home" className="nav-link"> Home </a></li>
-                  <li><a href = "/about" className="nav-link"> About </a></li>
+                  <li><Link href = "/home" className="nav-link"> Home </Link></li>
+                  <li><Link href = "/about" className="nav-link"> About </Link></li>
                 </ul>
               </nav>
 
-              {user.isAuthenticated && <a href = "/accounts/logout/" className = "login-button"><span> {user.username} (Logout) </span></a>}
-              {!user.isAuthenticated && <a href = "/accounts/login" className = "login-button"><span> Login </span></a>}
+              <LoginButton/>
 
             </div>
 
@@ -48,13 +46,11 @@ export default function Header() {
           <div className = {`mobile-menu ${isMenuOpen ? "open" : ""}`}>
             <nav>
               <ul className = "mobile-links">
-                <li><a href = "/home" className="mobile-link"> Home </a></li>
-                <li><a href = "/about" className="mobile-link"> About </a></li>
+                <li><Link href = "/home" className="mobile-link"> Home </Link></li>
+                <li><Link href = "/about" className="mobile-link"> About </Link></li>
               </ul>
             </nav>
-            <a href = "/login" className = "login-button mobile-login">
-              <span> Login </span>
-            </a>
+            <LoginButton/>
           </div>
 
         </div>
