@@ -2,7 +2,7 @@
 
 import React from "react";
 import FilterForm from '@/app/components/map/FilterForm';
-import StartMap from '@/app/components/map/StartMap';
+
 
 export default function finderPage() {
 
@@ -35,10 +35,7 @@ export default function finderPage() {
     return (
         <div>
             <div>
-                <FilterForm />
-            </div>
-            <div>
-                <StartMap destination={coords} />
+                <FilterForm destination={coords}/>
             </div>
         </div>
     );
