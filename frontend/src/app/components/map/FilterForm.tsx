@@ -1,6 +1,14 @@
 import {useState} from "react";
 import StartMap from '@/app/components/map/StartMap';
 import Search from '@/app/components/map/Search';
+import {Loader} from "@googlemaps/js-api-loader";
+
+const loader = new Loader({
+                apiKey: process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY!,
+                version: 'weekly'
+});
+
+const { PriceLevel } = await loader.importLibrary('places');
 
 const formStyle = {
     backgroundColor: 'tan',
@@ -23,6 +31,8 @@ export default function FilterForm({destination} : Props) {
         setIsLoading(false);
     }
 
+    // @ts-ignore
+    // @ts-ignore
     return (
         <div>
             <form style={formStyle} onSubmit={onFinish}>
@@ -49,14 +59,19 @@ export default function FilterForm({destination} : Props) {
                     </div>
                     <div className="form-item">
                         <label htmlFor="budget">Budget</label>
-                        <input
+                        <select
                             required
                             name="budget"
-                            type="number"
                             value={formData.budget}
                             onChange={(event) =>
                                 setFormData({...formData, budget: event.target.value})}
-                        />
+                        >
+                            <option value=""> Select </option>
+                            <option value={PriceLevel.INEXPENSIVE}> Inexpensive </option>
+                            <option value={PriceLevel.MODERATE}> Moderate </option>
+                            <option value={PriceLevel.EXPENSIVE}> Expensive </option>
+                            <option value={PriceLevel.VERY_EXPENSIVE}> Very Expensive </option>
+                        </select>
                     </div>
                 </div>
                 <div>
@@ -67,6 +82,7 @@ export default function FilterForm({destination} : Props) {
             </form>
             <div>
                 {loadStartMap ? <StartMap destination={destination} /> :
+                    //@ts-ignore
                     <Search position={destination} formData={formData} />}
             </div>
         </div>

@@ -5,7 +5,6 @@ import "./globals.css";
 import Head from "./templateComponents/head/head";
 import Footer from "./templateComponents/footer";
 import Header from "./templateComponents/header";
-import 'semantic-ui-css/semantic.min.css'
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
