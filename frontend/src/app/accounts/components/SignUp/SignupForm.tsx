@@ -18,6 +18,7 @@ export default function SignupForm() {
   const [email, setEmail] = useState('');
   const [errors, setErrors] = useState();
 
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 

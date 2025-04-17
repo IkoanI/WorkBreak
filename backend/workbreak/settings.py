@@ -42,7 +42,8 @@ INSTALLED_APPS = [
     'corsheaders',
     'workbreak',
     'accounts',
-    'home'
+    'home',
+    'user'
 ]
 
 MIDDLEWARE = [
