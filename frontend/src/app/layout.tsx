@@ -7,25 +7,7 @@ import "./globals.css";
 import Head from "./templateComponents/head/head";
 import Footer from "./templateComponents/footer";
 import Header from "./templateComponents/header";
-
-import {createContext, useState} from 'react';
-
-export type User = {
-    isAuthenticated: boolean
-    username: string
-}
-
-export type UserContextType = {
-  user: User
-  setUser:(x: User) => void
-}
-
-const UserContext = createContext<UserContextType>(
-    {
-        user: {username : "placeholder", isAuthenticated: false},
-        setUser: () => {},
-    }
-)
+import {ContextProvider} from "@/app/AppContext";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -43,21 +25,17 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
 
-    const [user, setUser] = useState({username : "placeholder", isAuthenticated: false});
-    
+
   return (
-    <html lang="en">
-      <Head />
-      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
-        <UserContext.Provider value={{user : user, setUser : setUser}}>
-          <Header />
-          {children}
-          <Footer />
-        </UserContext.Provider>
-      </body>
-    </html>
+      <ContextProvider>
+        <html lang="en">
+            <Head />
+            <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+            <Header />
+            {children}
+            <Footer />
+            </body>
+        </html>
+      </ContextProvider>
   );
 }
-
-//dont ask why it just works
-export { UserContext }

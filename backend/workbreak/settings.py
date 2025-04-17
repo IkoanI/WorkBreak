@@ -9,7 +9,7 @@ https://docs.djangoproject.com/en/5.1/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.1/ref/settings/
 """
-
+import os
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -137,3 +137,10 @@ CORS_ALLOWED_ORIGINS = [
 APPEND_SLASH = False
 
 LOGIN_URL = "/accounts/login"
+
+EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+EMAIL_HOST = "smtp.gmail.com"
+EMAIL_USE_TLS = True
+EMAIL_PORT = 587
+EMAIL_HOST_USER = "cs2340group3@gmail.com"
+EMAIL_HOST_PASSWORD = os.getenv("CS2340_Gmail_App_Password")

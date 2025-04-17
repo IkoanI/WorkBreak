@@ -3,6 +3,7 @@ from django.contrib.auth import login as auth_login, authenticate, logout as aut
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 import json
+
 from .forms import CustomUserCreationForm
 # Create your views here.
 def signup(request):
@@ -20,7 +21,6 @@ def signup(request):
 def login(request):
     if request.method == 'POST':
         data = json.loads(request.body)
-        print(json.dumps(data, indent=4))
         user = authenticate(
             request,
             username = data['username'],
