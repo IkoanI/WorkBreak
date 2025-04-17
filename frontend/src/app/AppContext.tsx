@@ -1,6 +1,6 @@
 // GLOBAL VARIABLES FOR THE APP
-
 import React, {createContext, useContext, useState} from 'react';
+
 type User = {
     username : string;
     isAuthenticated: boolean;
