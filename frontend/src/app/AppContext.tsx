@@ -4,7 +4,7 @@ import React, {createContext, useContext, useState} from 'react';
 // CHANGE IN PRODUCTION
 export const backendURL = "http://127.0.0.1:8000"
 
-export const default_image_url = "/media/workbreak.png"
+export const default_image_url = backendURL + "/media/workbreak.png"
 
 export type User = {
     username : string;

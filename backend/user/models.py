@@ -1,16 +1,17 @@
+import os
+
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.db import models
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 
-def upload_to(instance, filename):
-    return 'images/{filename}'.format(filename=filename)
-
+def get_upload_path(instance, filename):
+    return '{user}/{filename}'.format(user=instance.user.username, filename=filename)
 # Create your models here.
 class UserProfile(models.Model):
     user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
-    image = models.ImageField(default="workbreak.png")
+    image = models.ImageField(default="workbreak.png", upload_to=get_upload_path, blank=True)
 
     def __str__(self):
         return self.user.username + " Profile"

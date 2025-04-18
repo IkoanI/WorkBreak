@@ -1,13 +1,19 @@
+import os.path
+
 from django.contrib.auth.decorators import login_required
 import json
 from django_nextjs.render import render_nextjs_page
 from django.http import JsonResponse
-from rest_framework import viewsets
-from rest_framework.parsers import MultiPartParser, FormParser
+from rest_framework import viewsets, status
+from rest_framework.parsers import MultiPartParser, FormParser, FileUploadParser
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
+from rest_framework.views import APIView
 
 from user.forms import UpdateUserForm
 from user.models import UserProfile
 from user.serializer import UserProfileSerializer
+from workbreak import settings
 
 
 # Create your views here.
@@ -17,10 +23,11 @@ async def profile(request):
 
 
 @login_required
-def update_profile(request):
+def update_user(request):
     if request.method == 'POST':
         data = json.loads(request.body)
-        form = UpdateUserForm(data, instance=request.user)
+        user = request.user
+        form = UpdateUserForm(data, instance=user)
         if not form.is_valid():
             return JsonResponse(form.errors, status=400)
 
@@ -29,11 +36,17 @@ def update_profile(request):
 
     return JsonResponse({'error': 'Invalid request method'}, status=405)
 
-class UserProfileViewSet(viewsets.ModelViewSet):
-    queryset = UserProfile.objects.all()
-    serializer_class = UserProfileSerializer
-    parser_classes = (MultiPartParser, FormParser)
+class UpdateUserProfileAPIView(APIView):
+    permission_classes = (IsAuthenticated, )
+    parser_classes = [MultiPartParser, FileUploadParser]
 
-    def perform_create(self, serializer):
-        serializer.save(creator=self.request.user)
+    def post(self, request):
+        user_profile = UserProfile.objects.get(user=request.user)
+        serializer = UserProfileSerializer(instance=user_profile, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(data=serializer.data, status=200)
+
+        print(serializer.errors)
+        return Response(data=serializer.errors, status=500)
 

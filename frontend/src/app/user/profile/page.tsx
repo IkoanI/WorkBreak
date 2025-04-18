@@ -5,7 +5,7 @@ import { useState, useRef } from "react"
 import Image from "next/image"
 import { Camera, Check } from "lucide-react"
 import "./styles.css"
-import {backendURL, default_image_url, useAppContext, User} from "@/app/AppContext";
+import { default_image_url, useAppContext, User} from "@/app/AppContext";
 import {getCookie} from "typescript-cookie";
 
 const cuisineOptions = [
@@ -22,15 +22,14 @@ const cuisineOptions = [
 export default function ProfilePage() {
   const {user, setUser} = useAppContext()
   const [newUser, setNewUser] = useState<User>(user);
-
-  const [profileImage, setProfileImage] = useState()
-  const [selectedCuisines, setSelectedCuisines] = useState<string[]>(["italian", "chinese"])
   const [isEditing, setIsEditing] = useState(false)
   const [isSaving, setIsSaving] = useState(false)
   const [saveSuccess, setSaveSuccess] = useState(false)
-  const [errors, setErrors] = useState();
-
+  const [errors, setErrors] = useState({"username":""});
   const fileInputRef = useRef<HTMLInputElement>(null)
+
+  const [newImage, setNewImage] = useState();
+  const [selectedCuisines, setSelectedCuisines] = useState<string[]>(["italian", "chinese"])
 
   const handleImageClick = () => {
     if (isEditing && fileInputRef.current) fileInputRef.current.click()
@@ -39,9 +38,10 @@ export default function ProfilePage() {
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
     if (file) {
+      setNewImage(file)
       const reader = new FileReader()
       reader.onload = (e) => {
-        if (e.target?.result) setProfileImage(e.target.result as string)
+        if (e.target?.result) setNewUser({...newUser, image: e.target.result as string})
       }
       reader.readAsDataURL(file)
     }
@@ -61,26 +61,42 @@ export default function ProfilePage() {
 
     setIsSaving(true);
 
-    const response = await fetch('/user/api/update_profile', {
+    const updateUserResponse = await fetch('/user/api/update_user', {
       method: 'POST',
       headers: {
         'X-CSRFToken': getCookie('csrftoken') || '',
         'Content-type': 'application/json'
       },
-      body: JSON.stringify(newUser),
+      body: JSON.stringify({"username":newUser.username}),
       credentials: 'include',
     });
 
-    const data = await response.json();
 
-    if (response.ok) {
+    const formdata = new FormData();
+    if (newImage) {
+      formdata.append('image', newImage);
+    }
+
+    const updateUserProfileResponse = await fetch('/user/api/update_profile', {
+      method: 'POST',
+      headers: {
+        'X-CSRFToken': getCookie('csrftoken') || '',
+      },
+      body: formdata,
+      credentials: 'include',
+    });
+
+    const updateUserData = await updateUserResponse.json();
+    const updateUserProfileData = await updateUserProfileResponse.json();
+
+    if (updateUserResponse.ok && updateUserProfileResponse.ok) {
       setSaveSuccess(true)
       setTimeout(() => setSaveSuccess(false), 3000)
       setIsEditing(false);
       setUser(newUser);
-      setErrors(null);
+      setErrors({"username":""});
     } else {
-      setErrors(data);
+      setErrors({...updateUserData, ...updateUserProfileData});
     }
 
     setIsSaving(false);
@@ -89,7 +105,7 @@ export default function ProfilePage() {
   const handleEdit = () => {
     setNewUser(user);
     setIsEditing(!isEditing);
-    setErrors(null);
+    setErrors({"username":""});
   }
 
   return (
@@ -112,7 +128,8 @@ export default function ProfilePage() {
                 <div className="profile-details">
                   <div className="image-section">
                     <div className={`image-wrapper ${isEditing ? "editable" : ""}`} onClick={handleImageClick}>
-                      <Image src={backendURL + (user.image == "" ? default_image_url : user.image)} alt="Profile" fill className="image" />
+                      {!isEditing && <Image src={user.image == "" ? default_image_url : user.image} alt="Profile" fill className="image" />}
+                      {isEditing &&  <Image src={newUser.image == "" ? default_image_url : newUser.image} alt="Profile" fill className="image" />}
                       {isEditing && (
                         <div className="image-overlay">
                           <Camera className="overlay-icon" size={32} />
@@ -120,6 +137,7 @@ export default function ProfilePage() {
                       )}
                     </div>
                     <input
+                      name="avatar"
                       type="file"
                       ref={fileInputRef}
                       onChange={handleImageChange}
@@ -138,7 +156,7 @@ export default function ProfilePage() {
                       <input
                         type="text"
                         id="username"
-                        onChange={(e) => setNewUser({...user, username: e.target.value})}
+                        onChange={(e) => setNewUser({...newUser, username: e.target.value})}
                         value={isEditing ? newUser.username : user.username}
                         className={`username-input ${isEditing ? "editable-input" : "readonly-input"}`}
                         disabled={!isEditing}
@@ -175,6 +193,8 @@ export default function ProfilePage() {
                       </div>
                     ))}
                   </div>
+
+                  <a href = "/accounts/logout/"><span> Logout </span></a>
                 </div>
 
                 {isEditing && (

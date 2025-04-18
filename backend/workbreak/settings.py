@@ -43,7 +43,8 @@ INSTALLED_APPS = [
     'workbreak',
     'accounts',
     'home',
-    'user'
+    'user',
+    'django_cleanup.apps.CleanupConfig',
 ]
 
 MIDDLEWARE = [
