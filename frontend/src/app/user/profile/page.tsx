@@ -1,6 +1,6 @@
 "use client"
 
-import type React from "react"
+import React, {useEffect} from "react"
 import { useState, useRef } from "react"
 import Image from "next/image"
 import { Camera, Check } from "lucide-react"
@@ -27,8 +27,11 @@ export default function ProfilePage() {
   const [saveSuccess, setSaveSuccess] = useState(false)
   const [errors, setErrors] = useState({"username":""});
   const fileInputRef = useRef<HTMLInputElement>(null)
+  const [newImage, setNewImage] = useState<File>();
 
-  const [newImage, setNewImage] = useState();
+  useEffect(() => {
+    setNewUser(user);
+  }, [user])
 
   const handleImageClick = () => {
     if (isEditing && fileInputRef.current) fileInputRef.current.click()
@@ -129,8 +132,7 @@ export default function ProfilePage() {
                 <div className="profile-details">
                   <div className="image-section">
                     <div className={`image-wrapper ${isEditing ? "editable" : ""}`} onClick={handleImageClick}>
-                      {!isEditing && <Image src={user.image == "" ? default_image_url : user.image} alt="Profile" fill className="image" />}
-                      {isEditing &&  <Image src={newUser.image == "" ? default_image_url : newUser.image} alt="Profile" fill className="image" />}
+                      <Image src={newUser.image == "" ? default_image_url : newUser.image} alt="Profile" fill className="image" />
                       {isEditing && (
                         <div className="image-overlay">
                           <Camera className="overlay-icon" size={32} />
@@ -158,7 +160,7 @@ export default function ProfilePage() {
                         type="text"
                         id="username"
                         onChange={(e) => setNewUser({...newUser, username: e.target.value})}
-                        value={isEditing ? newUser.username : user.username}
+                        value={newUser.username}
                         className={`username-input ${isEditing ? "editable-input" : "readonly-input"}`}
                         disabled={!isEditing}
                       />
