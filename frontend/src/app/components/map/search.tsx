@@ -1,8 +1,7 @@
 import React, { useEffect } from "react";
-import {Loader} from "@googlemaps/js-api-loader";
 import Latlon, { Dms } from 'geodesy/latlon-ellipsoidal-vincenty'
 import PriceLevel = google.maps.places.PriceLevel;
-
+import { mapsLibrary, markerLibrary, placesLibrary } from "@/app/AppContext";
 
 type Props = {
     position: {lat: number, lng: number},
@@ -24,15 +23,6 @@ export default function Search (data : Props) {
             } else {
                 cuisine = data.formData.cuisine + ' food';
             }
-            const loader = new Loader({
-                apiKey: process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY!,
-                version: 'weekly'
-            });
-
-            const { Place, PriceLevel } = await loader.importLibrary('places');
-            const { AdvancedMarkerElement } = await loader.importLibrary('marker')
-            const { Map, InfoWindow } = await loader.importLibrary('maps');
-
 
             const request = {
                 textQuery: cuisine,
@@ -48,15 +38,14 @@ export default function Search (data : Props) {
                 zoom: 15,
                 mapId: 'Search_Map'
             }
-            const map = new Map(mapRef.current as unknown as HTMLDivElement, mapOptions);
+            const map =  (new (mapsLibrary.Map)(mapRef.current as unknown as HTMLDivElement, mapOptions));
 
-            const { places } = await Place.searchByText(request);
-            const infoWindow = new InfoWindow();
+            const { places } = await placesLibrary.Place.searchByText(request);
+            const infoWindow = new (mapsLibrary.InfoWindow);
             const distance = Number(data.formData.distance) * 1609.344;
 
             if (places.length) {
 
-                const {LatLngBounds} = await loader.importLibrary('core');
                 const bounds = new google.maps.LatLngBounds();
 
                 // loops through all the places and gets all the results //
@@ -68,11 +57,11 @@ export default function Search (data : Props) {
                     console.log(dist);
                     console.log(place.priceLevel);
                     if (distance >= dist) {
-                        const marker = new AdvancedMarkerElement({
+                        const marker = (new (markerLibrary.AdvancedMarkerElement)({
                             map,
                             position: place.location,
                             title: place.displayName,
-                        })
+                        }))
                         let infoWindowNode = document.createElement("div");
                         let text = document.createElement("div");
                         text.innerText = place.displayName + '\n' + place.formattedAddress + '\n' +
@@ -89,8 +78,7 @@ export default function Search (data : Props) {
 
                         bounds.extend(place.location as google.maps.LatLng);
                     }
-                });
-
+                })
                 map.fitBounds(bounds);
             } else {
                 console.log("no results");

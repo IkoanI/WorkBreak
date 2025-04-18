@@ -1,14 +1,8 @@
-import {useState} from "react";
+"use client"
+import { useState, useEffect } from "react";
 import StartMap from '@/app/components/map/StartMap';
 import Search from '@/app/components/map/Search';
-import {Loader} from "@googlemaps/js-api-loader";
-
-const loader = new Loader({
-                apiKey: process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY!,
-                version: 'weekly'
-});
-
-const { PriceLevel } = await loader.importLibrary('places');
+import { placesLibrary } from "@/app/AppContext";
 
 const formStyle = {
     backgroundColor: 'tan',
@@ -19,6 +13,7 @@ type Props = {
 };
 
 export default function FilterForm({destination} : Props) {
+
     const [formData, setFormData] = useState({cuisine: "", distance: "", budget: ""});
     const [isLoading, setIsLoading] = useState(false);
     const [loadStartMap, setLoadStartMap] = useState(true);
@@ -31,8 +26,6 @@ export default function FilterForm({destination} : Props) {
         setIsLoading(false);
     }
 
-    // @ts-ignore
-    // @ts-ignore
     return (
         <div>
             <form style={formStyle} onSubmit={onFinish}>
@@ -67,10 +60,10 @@ export default function FilterForm({destination} : Props) {
                                 setFormData({...formData, budget: event.target.value})}
                         >
                             <option value=""> Select </option>
-                            <option value={PriceLevel.INEXPENSIVE}> Inexpensive </option>
-                            <option value={PriceLevel.MODERATE}> Moderate </option>
-                            <option value={PriceLevel.EXPENSIVE}> Expensive </option>
-                            <option value={PriceLevel.VERY_EXPENSIVE}> Very Expensive </option>
+                            <option value={placesLibrary.PriceLevel.INEXPENSIVE}> Inexpensive </option>
+                            <option value={placesLibrary.PriceLevel.MODERATE}> Moderate </option>
+                            <option value={placesLibrary.PriceLevel.EXPENSIVE}> Expensive </option>
+                            <option value={placesLibrary.PriceLevel.VERY_EXPENSIVE}> Very Expensive </option>
                         </select>
                     </div>
                 </div>

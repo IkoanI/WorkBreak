@@ -3,7 +3,6 @@
 import React from "react";
 import FilterForm from '@/app/components/map/FilterForm';
 
-
 export default function finderPage() {
 
     let coords = {
@@ -31,6 +30,7 @@ export default function finderPage() {
     };
 
     getPosition();
+
 
     return (
         <div>

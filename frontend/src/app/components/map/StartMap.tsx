@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useState} from "react";
-import { Loader } from "@googlemaps/js-api-loader";
+import { mapsLibrary, markerLibrary } from "@/app/AppContext";
 
 type Props = {
   destination: { lat: number; lng: number };
@@ -19,23 +19,15 @@ export default function homeMap({destination} : Props) {
     useEffect(() => {
         const initMap = async () => {
 
-            const loader = new Loader({
-                apiKey: process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY!,
-                version: 'weekly'
-            });
-
-            const {Map} = await loader.importLibrary('maps');
-            const {AdvancedMarkerElement} = await loader.importLibrary('marker');
-
             const mapOptions: google.maps.MapOptions = {
                 center: destination,
                 zoom: 15,
                 mapId: 'HOME_MAP'
             }
 
-            const map = new Map(mapRef.current as unknown as HTMLDivElement, mapOptions);
+            const map = new mapsLibrary.Map(mapRef.current as unknown as HTMLDivElement, mapOptions);
 
-            const marker = new AdvancedMarkerElement({
+            const marker = new markerLibrary.AdvancedMarkerElement({
                 map: map,
                 position: destination,
                 title: 'Start Location'
