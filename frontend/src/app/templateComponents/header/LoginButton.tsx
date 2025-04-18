@@ -3,26 +3,31 @@ import {useAppContext} from "@/app/AppContext";
 import Link from "next/link";
 
 export default function LoginButton() {
-    const {user, setUser} = useAppContext()
+    const {user, setUser, isAuthenticated, setIsAuthenticated} = useAppContext()
 
     useEffect(() => {
       async function check_auth() {
           const response = await fetch('/accounts/api/check_auth');
           const data = await response.json();
           if (response.ok) {
-            setUser({username : data.username, isAuthenticated: true})
+            setUser({username : data['username'], image: data['image']});
+            if (!isAuthenticated) {
+                setIsAuthenticated(true);
+            }
           } else {
-            setUser({username: "default", isAuthenticated: false})
+            setUser({username: "", image: ""});
+            if (isAuthenticated) {
+                setIsAuthenticated(false);
+            }
           }
       }
 
       check_auth();
-    }, [setUser])
+    }, [isAuthenticated, setIsAuthenticated, setUser])
 
-    if (user.isAuthenticated) {
+    if (isAuthenticated) {
        return (
-           // Not using <Link> tag to redirect here is right as logout is a Django function
-           <a href="/accounts/logout/" className="login-button"><span> {user.username} (Logout) </span></a>
+           <Link href = "/user/profile" className = "login-button"><span> {user.username} </span></Link>
        );
     } else {
         return (

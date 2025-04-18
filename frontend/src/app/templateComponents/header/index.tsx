@@ -23,7 +23,6 @@ export default function Header() {
               <div className = "logo-text"> WORKBREAK</div>
             </div>
 
-<<<<<<< HEAD
             <div className = "desktop-nav">
               <nav>
 
@@ -36,19 +35,6 @@ export default function Header() {
               <LoginButton/>
 
             </div>
-=======
-          <div className = "desktop-nav">
-            <nav>
-              <ul className = "nav-links">
-                <li><a href = "/home" className="nav-link"> Home </a></li>
-                <li><a href = "/about" className="nav-link"> About </a></li>
-              </ul>
-            </nav>
-            <a href = "/accounts/login" className = "login-button">
-              <span> Login </span>
-            </a>
-          </div>
->>>>>>> 813fb790e69b1f5a734010513366bb07a9bf452b
 
             {/* When Screen Small, Mobile Menu Button Appears */}
             <button className = "mobile-menu-button" onClick={() => setIsMenuOpen(!isMenuOpen)}>
@@ -56,7 +42,6 @@ export default function Header() {
             </button>
           </div>
 
-<<<<<<< HEAD
           {/* Mobile Menu */}
           <div className = {`mobile-menu ${isMenuOpen ? "open" : ""}`}>
             <nav>
@@ -67,23 +52,7 @@ export default function Header() {
             </nav>
             <LoginButton/>
           </div>
-
-=======
-        {/* Mobile Menu */}
-        <div className={`mobile-menu ${isMenuOpen ? "open" : ""}`}>
-          <nav>
-            <ul className = "mobile-links">
-              <li><a href = "#" className="mobile-link"> Home </a></li>
-              <li><a href = "#" className="mobile-link"> About </a></li>
-            </ul>
-          </nav>
-          <a href = "/login" className = "login-button mobile-login">
-            <span> Login </span>
-          </a>
->>>>>>> 813fb790e69b1f5a734010513366bb07a9bf452b
         </div>
-      
-      </div>
     </header>
   );
 }
