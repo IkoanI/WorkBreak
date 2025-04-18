@@ -42,6 +42,7 @@ def check_auth(request):
     user = request.user
     userprofile = UserProfile.objects.get(user=user)
     response = {'username': user.get_username(),
-                'image': userprofile.image.url}
+                'image': userprofile.image.url,
+                'cuisines': userprofile.cuisines,}
 
     return JsonResponse(response, status=200)

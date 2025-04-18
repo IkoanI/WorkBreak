@@ -1,11 +1,8 @@
-import os.path
-
 from django.contrib.auth.decorators import login_required
 import json
 from django_nextjs.render import render_nextjs_page
 from django.http import JsonResponse
-from rest_framework import viewsets, status
-from rest_framework.parsers import MultiPartParser, FormParser, FileUploadParser
+from rest_framework.parsers import MultiPartParser, FileUploadParser
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -13,7 +10,6 @@ from rest_framework.views import APIView
 from user.forms import UpdateUserForm
 from user.models import UserProfile
 from user.serializer import UserProfileSerializer
-from workbreak import settings
 
 
 # Create your views here.

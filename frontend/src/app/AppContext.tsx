@@ -9,6 +9,13 @@ export const default_image_url = backendURL + "/media/workbreak.png"
 export type User = {
     username : string;
     image: string;
+    cuisines: string[];
+}
+
+export const defaultUser = {
+    username : "",
+    image : "",
+    cuisines : new Array<string>()
 }
 
 type AppContextType = {
@@ -24,7 +31,7 @@ type ContextProviderProps = {
 
 export const AppContext = createContext<AppContextType>(
     {
-        user: {username:"", image:""},
+        user: defaultUser,
         setUser: () => {},
         isAuthenticated:false,
         setIsAuthenticated: () => {}
@@ -34,7 +41,7 @@ export const AppContext = createContext<AppContextType>(
 export const useAppContext = () => useContext(AppContext);
 
 export const ContextProvider = ({ children }: ContextProviderProps) => {
-  const [user, setUser] = useState({username:"", image:"",});
+  const [user, setUser] = useState(defaultUser);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   return (

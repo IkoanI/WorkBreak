@@ -1,5 +1,5 @@
 import {useEffect} from "react";
-import {backendURL, useAppContext} from "@/app/AppContext";
+import {backendURL, defaultUser, useAppContext} from "@/app/AppContext";
 import Link from "next/link";
 
 export default function LoginButton() {
@@ -10,12 +10,12 @@ export default function LoginButton() {
           const response = await fetch('/accounts/api/check_auth');
           const data = await response.json();
           if (response.ok) {
-            setUser({username : data['username'], image: backendURL + data['image']});
+            setUser({username : data['username'], image: backendURL + data['image'], cuisines : data['cuisines']});
             if (!isAuthenticated) {
                 setIsAuthenticated(true);
             }
           } else {
-            setUser({username: "", image: ""});
+            setUser(defaultUser);
             if (isAuthenticated) {
                 setIsAuthenticated(false);
             }

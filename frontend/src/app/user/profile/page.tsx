@@ -29,7 +29,6 @@ export default function ProfilePage() {
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   const [newImage, setNewImage] = useState();
-  const [selectedCuisines, setSelectedCuisines] = useState<string[]>(["italian", "chinese"])
 
   const handleImageClick = () => {
     if (isEditing && fileInputRef.current) fileInputRef.current.click()
@@ -48,11 +47,11 @@ export default function ProfilePage() {
   }
 
   const handleCuisineToggle = (cuisineId: string) => {
-    setSelectedCuisines((prev) => {
-      const updated = prev.includes(cuisineId)
-        ? prev.filter((id) => id !== cuisineId)
-        : [...prev, cuisineId]
-      return updated
+    setNewUser((prev) => {
+      const updatedCuisines = prev.cuisines.includes(cuisineId)
+        ? prev.cuisines.filter((id) => id !== cuisineId)
+        : [...prev.cuisines, cuisineId]
+      return {...prev, cuisines: updatedCuisines}
     })
   }
 
@@ -72,17 +71,19 @@ export default function ProfilePage() {
     });
 
 
-    const formdata = new FormData();
+    const form_data = new FormData();
     if (newImage) {
-      formdata.append('image', newImage);
+      form_data.append('image', newImage);
     }
+
+    form_data.append('cuisines', JSON.stringify(newUser.cuisines))
 
     const updateUserProfileResponse = await fetch('/user/api/update_profile', {
       method: 'POST',
       headers: {
         'X-CSRFToken': getCookie('csrftoken') || '',
       },
-      body: formdata,
+      body: form_data,
       credentials: 'include',
     });
 
@@ -176,18 +177,18 @@ export default function ProfilePage() {
                       <div
                         key={cuisine.id}
                         className={`cuisine-option ${isEditing ? "clickable" : ""} ${
-                          selectedCuisines.includes(cuisine.id) ? "cuisine-selected" : "cuisine-unselected"
+                          newUser.cuisines.includes(cuisine.id) ? "cuisine-selected" : "cuisine-unselected"
                         }`}
                         onClick={() => isEditing && handleCuisineToggle(cuisine.id)}
                       >
                         <div
                           className={`cuisine-check ${
-                            selectedCuisines.includes(cuisine.id)
+                            newUser.cuisines.includes(cuisine.id)
                               ? "check-filled"
                               : "check-empty"
                           }`}
                         >
-                          {selectedCuisines.includes(cuisine.id) && <Check size={14} />}
+                          {newUser.cuisines.includes(cuisine.id) && <Check size={14} />}
                         </div>
                         <span className="cuisine-label">{cuisine.label}</span>
                       </div>
