@@ -52,8 +52,7 @@ export default function Header() {
             </nav>
             <LoginButton/>
           </div>
-
         </div>
-      </header>
+    </header>
   );
 }
