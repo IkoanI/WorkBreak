@@ -5,6 +5,7 @@ import { getCookie } from 'typescript-cookie';
 import { redirect } from "next/navigation";
 import SignupInput from "./SignupInput";
 import "./SignupForm.css";
+import Link from "next/link";
 
 /*
    IM NOT GOOD WITH TYPESCRIPT, PROBABLY VIOLATING A BUNCH OF BEST PRACTICES
@@ -61,7 +62,7 @@ export default function SignupForm() {
         {errors != undefined && errors["email"] && <p>{errors["email"]}</p>}
         <SignupInput
           label = "Email:"
-          type= " email"
+          type= "email"
           value = {email}
           onChange = {(e) => setEmail(e.target.value)}
         />
@@ -90,9 +91,9 @@ export default function SignupForm() {
       <div className = "signup-footer">
         <p> 
           Already have an account?{" "}
-          <a href = "/accounts/login" className = "signup-link">
+          <Link href = "/accounts/login" className = "signup-link">
             Log in
-          </a>
+          </Link>
         </p>
       </div>
     </div>
