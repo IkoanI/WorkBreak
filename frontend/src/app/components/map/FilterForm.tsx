@@ -2,6 +2,7 @@
 import { useState, useEffect } from "react";
 import StartMap from '@/app/components/map/StartMap';
 import Search from '@/app/components/map/Search';
+import SearchTiles from "@/app/components/map/SearchTiles";
 import { placesLibrary } from "@/app/AppContext";
 
 const formStyle = {
@@ -76,7 +77,7 @@ export default function FilterForm({destination} : Props) {
             <div>
                 {loadStartMap ? <StartMap destination={destination} /> :
                     //@ts-ignore
-                    <Search position={destination} formData={formData} />}
+                    <SearchTiles position={destination} formData={formData} />}
             </div>
         </div>
     );
