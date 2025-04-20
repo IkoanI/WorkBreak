@@ -9,8 +9,8 @@ urlpatterns = [
     path("home", nextjs_page(), name="home.index"),
     path("about", nextjs_page(), name="home.about"),
     path("api/user_visits", user_visits, name="user_visits"),
-    path("api/restaurants/<slug:slug>/", get_restaurant, name="get_restaurant"),
-    path("restaurants/<slug:slug>", nextjs_page(), name="restaurants.page"),
+    path("api/restaurants/<str:slug>/", get_restaurant, name="get_restaurant"),
+    path("restaurants/<str:slug>", nextjs_page(), name="restaurants.page"),
     # path("api/restaurants/<slug:slug>/reviews/", views.user_reviews, name="restaurant-reviews-api"),
-    path("api/restaurants/<slug:slug>/reviews/", nextjs_page(), name="restaurant-reviews-api"),
+    path("api/restaurants/<str:slug>/reviews/", nextjs_page(), name="restaurant-reviews-api"),
 ]
