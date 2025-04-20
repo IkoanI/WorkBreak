@@ -1,18 +1,18 @@
 'use client';
 
-import React, {useContext, useState} from 'react';
+import React, {useState} from 'react';
 import { getCookie } from 'typescript-cookie';
 import { redirect } from "next/navigation";
 import LoginInput from "./LoginInput";
 import "./LoginForm.css";
-import {useAppContext} from "@/app/AppContext";
 import Link from "next/link";
+import {useAppContext} from "@/app/AppContext";
 
 export default function LoginForm() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [errors, setErrors] = useState();
-  const { setUser } = useAppContext()
+  const {setIsAuthenticated} = useAppContext()
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -30,7 +30,7 @@ export default function LoginForm() {
     const data = await response.json();
 
     if (response.ok) {
-      setUser({username: username, isAuthenticated: true})
+      setIsAuthenticated(true);
       redirect('/home');
     } else {
       setErrors(data);

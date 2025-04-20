@@ -1,21 +1,14 @@
 "use client"
 
-import type React from "react"
-import { useState, useRef, useEffect } from "react"
+import React, {useEffect} from "react"
+import { useState, useRef } from "react"
 import Image from "next/image"
 import { Camera, Check } from "lucide-react"
 import "./styles.css"
+import { default_image_url, useAppContext, User} from "@/app/AppContext";
+import {getCookie} from "typescript-cookie";
 
-export default function ProfilePage() {
-  const [username, setUsername] = useState("user123")
-  const [profileImage, setProfileImage] = useState("")
-  const [selectedCuisines, setSelectedCuisines] = useState<string[]>([])
-  const [isEditing, setIsEditing] = useState(false)
-  const [isSaving, setIsSaving] = useState(false)
-  const [saveSuccess, setSaveSuccess] = useState(false)
-  const fileInputRef = useRef<HTMLInputElement>(null)
-
-  const cuisineOptions = [
+const cuisineOptions = [
     { id: "chinese", label: "Chinese" },
     { id: "italian", label: "Italian" },
     { id: "american", label: "American" },
@@ -24,26 +17,21 @@ export default function ProfilePage() {
     { id: "japanese", label: "Japanese" },
     { id: "thai", label: "Thai" },
     { id: "mediterranean", label: "Mediterranean" },
-  ]
+]
+
+export default function ProfilePage() {
+  const {user, setUser} = useAppContext()
+  const [newUser, setNewUser] = useState<User>(user);
+  const [isEditing, setIsEditing] = useState(false)
+  const [isSaving, setIsSaving] = useState(false)
+  const [saveSuccess, setSaveSuccess] = useState(false)
+  const [errors, setErrors] = useState({"username":""});
+  const fileInputRef = useRef<HTMLInputElement>(null)
+  const [newImage, setNewImage] = useState<File>();
 
   useEffect(() => {
-    const loadUserData = async () => {
-      try {
-        await new Promise((resolve) => setTimeout(resolve, 500))
-        const userData = {
-          username: "user123",
-          profileImage: "/next/Images/WorkBreakLogo.png",
-          cuisinePreferences: ["italian", "chinese"],
-        }
-        setUsername(userData.username)
-        setProfileImage(userData.profileImage)
-        setSelectedCuisines(userData.cuisinePreferences)
-      } catch (error) {
-        console.error("Error loading user data:", error)
-      }
-    }
-    loadUserData()
-  }, [])
+    setNewUser(user);
+  }, [user])
 
   const handleImageClick = () => {
     if (isEditing && fileInputRef.current) fileInputRef.current.click()
@@ -52,36 +40,76 @@ export default function ProfilePage() {
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
     if (file) {
+      setNewImage(file)
       const reader = new FileReader()
       reader.onload = (e) => {
-        if (e.target?.result) setProfileImage(e.target.result as string)
+        if (e.target?.result) setNewUser({...newUser, image: e.target.result as string})
       }
       reader.readAsDataURL(file)
     }
   }
 
   const handleCuisineToggle = (cuisineId: string) => {
-    setSelectedCuisines((prev) => {
-      const updated = prev.includes(cuisineId)
-        ? prev.filter((id) => id !== cuisineId)
-        : [...prev, cuisineId]
-      return updated
+    setNewUser((prev) => {
+      const updatedCuisines = prev.cuisines.includes(cuisineId)
+        ? prev.cuisines.filter((id) => id !== cuisineId)
+        : [...prev.cuisines, cuisineId]
+      return {...prev, cuisines: updatedCuisines}
     })
   }
 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault()
-    setIsSaving(true)
-    try {
-      await new Promise((resolve) => setTimeout(resolve, 1000))
+
+    setIsSaving(true);
+
+    const updateUserResponse = await fetch('/user/api/update_user', {
+      method: 'POST',
+      headers: {
+        'X-CSRFToken': getCookie('csrftoken') || '',
+        'Content-type': 'application/json'
+      },
+      body: JSON.stringify({"username":newUser.username}),
+      credentials: 'include',
+    });
+
+
+    const form_data = new FormData();
+    if (newImage) {
+      form_data.append('image', newImage);
+    }
+
+    form_data.append('cuisines', JSON.stringify(newUser.cuisines))
+
+    const updateUserProfileResponse = await fetch('/user/api/update_profile', {
+      method: 'POST',
+      headers: {
+        'X-CSRFToken': getCookie('csrftoken') || '',
+      },
+      body: form_data,
+      credentials: 'include',
+    });
+
+    const updateUserData = await updateUserResponse.json();
+    const updateUserProfileData = await updateUserProfileResponse.json();
+
+    if (updateUserResponse.ok && updateUserProfileResponse.ok) {
       setSaveSuccess(true)
       setTimeout(() => setSaveSuccess(false), 3000)
-      setIsEditing(false)
-    } catch (error) {
-      console.error("Error saving profile:", error)
-    } finally {
-      setIsSaving(false)
+      setIsEditing(false);
+      setUser(newUser);
+      setErrors({"username":""});
+    } else {
+      setErrors({...updateUserData, ...updateUserProfileData});
     }
+
+    setIsSaving(false);
+  }
+
+  const handleEdit = () => {
+    setNewUser(user);
+    setIsEditing(!isEditing);
+    setErrors({"username":""});
   }
 
   return (
@@ -93,7 +121,7 @@ export default function ProfilePage() {
               <div className="profile-header">
                 <h1 className="profile-title">Your Profile</h1>
                 <button
-                  onClick={() => setIsEditing(!isEditing)}
+                  onClick={handleEdit}
                   className={`edit-button ${isEditing ? "edit-cancel" : "edit-active"}`}
                 >
                   {isEditing ? "Cancel" : "Edit Profile"}
@@ -104,7 +132,7 @@ export default function ProfilePage() {
                 <div className="profile-details">
                   <div className="image-section">
                     <div className={`image-wrapper ${isEditing ? "editable" : ""}`} onClick={handleImageClick}>
-                      <Image src={profileImage || "/placeholder.svg"} alt="Profile" fill className="image" />
+                      <Image src={newUser.image == "" ? default_image_url : newUser.image} alt="Profile" fill className="image" />
                       {isEditing && (
                         <div className="image-overlay">
                           <Camera className="overlay-icon" size={32} />
@@ -112,6 +140,7 @@ export default function ProfilePage() {
                       )}
                     </div>
                     <input
+                      name="avatar"
                       type="file"
                       ref={fileInputRef}
                       onChange={handleImageChange}
@@ -130,11 +159,12 @@ export default function ProfilePage() {
                       <input
                         type="text"
                         id="username"
-                        value={username}
-                        onChange={(e) => setUsername(e.target.value)}
+                        onChange={(e) => setNewUser({...newUser, username: e.target.value})}
+                        value={newUser.username}
                         className={`username-input ${isEditing ? "editable-input" : "readonly-input"}`}
                         disabled={!isEditing}
                       />
+                      {errors != null && errors["username"] && <p>{errors["username"]}</p>}
                     </div>
                   </div>
                 </div>
@@ -149,23 +179,25 @@ export default function ProfilePage() {
                       <div
                         key={cuisine.id}
                         className={`cuisine-option ${isEditing ? "clickable" : ""} ${
-                          selectedCuisines.includes(cuisine.id) ? "cuisine-selected" : "cuisine-unselected"
+                          newUser.cuisines.includes(cuisine.id) ? "cuisine-selected" : "cuisine-unselected"
                         }`}
                         onClick={() => isEditing && handleCuisineToggle(cuisine.id)}
                       >
                         <div
                           className={`cuisine-check ${
-                            selectedCuisines.includes(cuisine.id)
+                            newUser.cuisines.includes(cuisine.id)
                               ? "check-filled"
                               : "check-empty"
                           }`}
                         >
-                          {selectedCuisines.includes(cuisine.id) && <Check size={14} />}
+                          {newUser.cuisines.includes(cuisine.id) && <Check size={14} />}
                         </div>
                         <span className="cuisine-label">{cuisine.label}</span>
                       </div>
                     ))}
                   </div>
+
+                  <a href = "/accounts/logout/"><span> Logout </span></a>
                 </div>
 
                 {isEditing && (
