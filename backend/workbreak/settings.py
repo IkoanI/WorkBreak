@@ -25,7 +25,9 @@ SECRET_KEY = 'django-insecure-_+*dvh_yn(98jl8-2frj_9eca)0sd@!)atp3ydhti2+dw#!jo3
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']  # Allows access from any IP for development
+# If you want to be more secure:
+# ALLOWED_HOSTS = ['localhost', '127.0.0.1', '192.168.X.X']  # replace with your LAN IP
 
 
 # Application definition
@@ -129,11 +131,9 @@ STATIC_URL = 'static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-CORS_ALLOWED_ORIGINS = [
-    # add server hosting frontend server in prod
-    "http://localhost:3000",
-]
+CORS_ALLOW_ALL_ORIGINS = True  # Allows all origins for development
 
 APPEND_SLASH = False
 
 LOGIN_URL = "/accounts/login"
+
