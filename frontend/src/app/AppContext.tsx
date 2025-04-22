@@ -1,10 +1,23 @@
 // GLOBAL VARIABLES FOR THE APP
 import React, {createContext, useContext, useEffect, useState} from 'react';
+import {Loader} from "@googlemaps/js-api-loader";
 
 // CHANGE IN PRODUCTION
 export const BACKEND_ENDPOINT = process.env.NEXT_PUBLIC_BACKEND_API_ENDPOINT
 
 export const default_image_url = BACKEND_ENDPOINT + "/media/workbreak.png"
+
+const loader = new Loader({
+    apiKey: process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY!,
+    version: 'weekly'
+});
+
+
+export const  placesLibrary = await loader.importLibrary('places');
+
+export const  markerLibrary = await loader.importLibrary('marker');
+
+export const  mapsLibrary = await loader.importLibrary('maps');
 
 export type User = {
     username : string;
