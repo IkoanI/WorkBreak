@@ -5,6 +5,7 @@ import "./styles.css";
 import { useParams } from 'next/navigation';
 import { useState, useEffect, FormEvent } from 'react';
 import { getCookie } from 'typescript-cookie';
+import { BACKEND_ENDPOINT } from "@/app/AppContext";
 
 interface Restaurant {
   name: string;
@@ -31,7 +32,7 @@ export default function RestaurantPage() {
   useEffect(() => {
     
     if (!slug) return;
-    fetch(`http://127.0.0.1:8000/api/restaurants/${slug}/`, {
+    fetch(`${BACKEND_ENDPOINT}/${slug}/`, {
       credentials: 'include',
     })
       .then(res => {
@@ -45,7 +46,7 @@ export default function RestaurantPage() {
   // get reviews
   useEffect(() => {
     if (!slug) return;
-    fetch (`http://127.0.0.1:8000/api/restaurants/${slug}/`, {
+    fetch (`${BACKEND_ENDPOINT}/api/restaurants/${slug}/`, {
       credentials: 'include',
     })
       .then(restaurant => restaurant.json())
@@ -60,7 +61,7 @@ export default function RestaurantPage() {
       //in workbreak/setting.py changed 3000 port to 8000 to check if it works, allowed page to render in 8000 port
       //but still correctly fetching user review from backend
 
-      const res = await fetch(`http://127.0.0.1:8000/api/restaurants/${slug}/reviews/`, {
+      const res = await fetch(`${BACKEND_ENDPOINT}/api/restaurants/${slug}/reviews/`, {
         method: 'POST',
         credentials: 'include',
         headers: {

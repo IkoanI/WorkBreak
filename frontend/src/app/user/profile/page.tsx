@@ -5,7 +5,7 @@ import { useState, useRef } from "react"
 import Image from "next/image"
 import { Camera, Check } from "lucide-react"
 import "./styles.css"
-import { default_image_url, useAppContext, User} from "@/app/AppContext";
+import {BACKEND_ENDPOINT, default_image_url, useAppContext, User} from "@/app/AppContext";
 import {getCookie} from "typescript-cookie";
 
 const cuisineOptions = [
@@ -63,7 +63,7 @@ export default function ProfilePage() {
 
     setIsSaving(true);
 
-    const updateUserResponse = await fetch('/user/api/update_user', {
+    const updateUserResponse = await fetch(`${BACKEND_ENDPOINT}/user/api/update_user`, {
       method: 'POST',
       headers: {
         'X-CSRFToken': getCookie('csrftoken') || '',
@@ -81,7 +81,7 @@ export default function ProfilePage() {
 
     form_data.append('cuisines', JSON.stringify(newUser.cuisines))
 
-    const updateUserProfileResponse = await fetch('/user/api/update_profile', {
+    const updateUserProfileResponse = await fetch(`${BACKEND_ENDPOINT}/user/api/update_profile`, {
       method: 'POST',
       headers: {
         'X-CSRFToken': getCookie('csrftoken') || '',

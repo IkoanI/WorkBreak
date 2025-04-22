@@ -6,7 +6,7 @@ import { redirect } from "next/navigation";
 import LoginInput from "./LoginInput";
 import "./LoginForm.css";
 import Link from "next/link";
-import {useAppContext} from "@/app/AppContext";
+import {BACKEND_ENDPOINT, useAppContext} from "@/app/AppContext";
 
 export default function LoginForm() {
   const [username, setUsername] = useState('');
@@ -17,7 +17,7 @@ export default function LoginForm() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    const response = await fetch('/accounts/api/login', {
+    const response = await fetch(`${BACKEND_ENDPOINT}/accounts/api/login`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -62,7 +62,7 @@ export default function LoginForm() {
         />
 
         <div className = "login-forgot">
-          <a href = "/accounts/password_reset/" className = "login-link">
+          <a href = {`${BACKEND_ENDPOINT}/accounts/password_reset/`} className = "login-link">
             Forgot password?
           </a>
         </div>

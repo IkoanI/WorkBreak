@@ -1,10 +1,10 @@
 // GLOBAL VARIABLES FOR THE APP
-import React, {createContext, useContext, useState} from 'react';
+import React, {createContext, useContext, useEffect, useState} from 'react';
 
 // CHANGE IN PRODUCTION
-export const backendURL = "http://127.0.0.1:8000"
+export const BACKEND_ENDPOINT = process.env.NEXT_PUBLIC_BACKEND_API_ENDPOINT
 
-export const default_image_url = backendURL + "/media/workbreak.png"
+export const default_image_url = BACKEND_ENDPOINT + "/media/workbreak.png"
 
 export type User = {
     username : string;
@@ -43,6 +43,26 @@ export const useAppContext = () => useContext(AppContext);
 export const ContextProvider = ({ children }: ContextProviderProps) => {
   const [user, setUser] = useState(defaultUser);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+
+  useEffect(() => {
+      async function check_auth() {
+          const response = await fetch(BACKEND_ENDPOINT + "/accounts/api/check_auth");
+          const data = await response.json();
+          if (response.ok) {
+            setUser({username : data['username'], image: BACKEND_ENDPOINT + data['image'], cuisines : data['cuisines']});
+            if (!isAuthenticated) {
+                setIsAuthenticated(true);
+            }
+          } else {
+            setUser(defaultUser);
+            if (isAuthenticated) {
+                setIsAuthenticated(false);
+            }
+          }
+      }
+
+      check_auth();
+    }, [isAuthenticated, setIsAuthenticated, setUser])
 
   return (
       <AppContext.Provider value={{user, setUser, isAuthenticated, setIsAuthenticated}}>

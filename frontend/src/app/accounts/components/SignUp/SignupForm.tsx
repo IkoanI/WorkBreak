@@ -6,6 +6,7 @@ import { redirect } from "next/navigation";
 import SignupInput from "./SignupInput";
 import "./SignupForm.css";
 import Link from "next/link";
+import {BACKEND_ENDPOINT} from "@/app/AppContext";
 
 /*
    IM NOT GOOD WITH TYPESCRIPT, PROBABLY VIOLATING A BUNCH OF BEST PRACTICES
@@ -22,7 +23,7 @@ export default function SignupForm() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    const response = await fetch('/accounts/api/signup', {
+    const response = await fetch(`${BACKEND_ENDPOINT}/accounts/api/signup`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
