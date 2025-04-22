@@ -10,6 +10,7 @@ from restaurants.models import Restaurant, UserReview
 
 # Create your views here.
 def get_restaurant(request, slug):
+    print(slug)
     restaurant = get_object_or_404(Restaurant, slug=slug)
     return JsonResponse({
         'name': restaurant.name,

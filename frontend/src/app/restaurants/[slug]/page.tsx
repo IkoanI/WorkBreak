@@ -32,7 +32,7 @@ export default function RestaurantPage() {
   useEffect(() => {
     
     if (!slug) return;
-    fetch(`${BACKEND_ENDPOINT}/${slug}/`, {
+    fetch(`${BACKEND_ENDPOINT}/restaurants/api/${slug}/`, {
       credentials: 'include',
     })
       .then(res => {
@@ -46,7 +46,7 @@ export default function RestaurantPage() {
   // get reviews
   useEffect(() => {
     if (!slug) return;
-    fetch (`${BACKEND_ENDPOINT}/api/restaurants/${slug}/`, {
+    fetch (`${BACKEND_ENDPOINT}/restaurants/api/${slug}/`, {
       credentials: 'include',
     })
       .then(restaurant => restaurant.json())
@@ -61,7 +61,7 @@ export default function RestaurantPage() {
       //in workbreak/setting.py changed 3000 port to 8000 to check if it works, allowed page to render in 8000 port
       //but still correctly fetching user review from backend
 
-      const res = await fetch(`${BACKEND_ENDPOINT}/api/restaurants/${slug}/reviews/`, {
+      const res = await fetch(`${BACKEND_ENDPOINT}/restaurants/api/${slug}/create_review/`, {
         method: 'POST',
         credentials: 'include',
         headers: {
