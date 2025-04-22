@@ -89,6 +89,17 @@ export default function RestaurantPage() {
       <p>{restaurant.description}</p>
       <section>
         <h2>Leave a Review</h2>
+
+        <div>
+          {reviews.map(review => (
+            <div key={review.user}>
+              <h3>{review.user}</h3>
+              <p>{review.comment}</p>
+              <p>Rating: {review.rating}</p>
+            </div>
+          ))}
+        </div>
+
         <form onSubmit={handleSubmit}>
           <label>
             Rating:
