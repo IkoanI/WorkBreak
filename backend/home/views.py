@@ -1,7 +1,5 @@
 import os
 import requests
-from django.shortcuts import render
-from django_nextjs.render import render_nextjs_page
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from .models import Visit
