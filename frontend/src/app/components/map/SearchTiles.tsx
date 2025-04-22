@@ -32,6 +32,8 @@ function PlacesSearchTiles ( data : Props ) {
         useStrictTypeFiltering: false,
     }
 
+    const distance = Number(data.formData.distance) * 1609.344;
+
     useEffect(() => {
         if (!window.google?.maps?.places?.Place || !request) return;
 
@@ -40,6 +42,16 @@ function PlacesSearchTiles ( data : Props ) {
 
         placesLibrary.Place.searchByText(request)
             .then((response) => {
+                response.places.map((place : Place)=> {
+                    const p1 = new Latlon(data.position.lat, data.position.lng);
+                    const p2 = new Latlon(place.location?.lat() as number, place.location?.lng() as number);
+                    const dist = p1.distanceTo(p2);
+                    if (distance >= dist) {
+                        console.log(dist);
+                        return(place);
+                    }
+                });
+                // @ts-ignore
                 setResults(response.places || []);
             })
             .catch((err) => {
