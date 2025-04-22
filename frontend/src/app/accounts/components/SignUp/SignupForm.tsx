@@ -5,6 +5,8 @@ import { getCookie } from 'typescript-cookie';
 import { redirect } from "next/navigation";
 import SignupInput from "./SignupInput";
 import "./SignupForm.css";
+import Link from "next/link";
+import {BACKEND_ENDPOINT} from "@/app/AppContext";
 
 /*
    IM NOT GOOD WITH TYPESCRIPT, PROBABLY VIOLATING A BUNCH OF BEST PRACTICES
@@ -17,10 +19,11 @@ export default function SignupForm() {
   const [email, setEmail] = useState('');
   const [errors, setErrors] = useState();
 
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    const response = await fetch('/accounts/api/signup', {
+    const response = await fetch(`${BACKEND_ENDPOINT}/accounts/api/signup`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -60,7 +63,7 @@ export default function SignupForm() {
         {errors != undefined && errors["email"] && <p>{errors["email"]}</p>}
         <SignupInput
           label = "Email:"
-          type= " email"
+          type= "email"
           value = {email}
           onChange = {(e) => setEmail(e.target.value)}
         />
@@ -89,9 +92,9 @@ export default function SignupForm() {
       <div className = "signup-footer">
         <p> 
           Already have an account?{" "}
-          <a href = "/accounts/login" className = "signup-link">
+          <Link href = "/accounts/login" className = "signup-link">
             Log in
-          </a>
+          </Link>
         </p>
       </div>
     </div>

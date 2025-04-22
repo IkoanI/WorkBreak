@@ -3,6 +3,7 @@ from django.contrib.auth import login as auth_login, authenticate, logout as aut
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 import json
+from user.models import UserProfile
 from .forms import CustomUserCreationForm
 # Create your views here.
 def signup(request):
@@ -20,7 +21,6 @@ def signup(request):
 def login(request):
     if request.method == 'POST':
         data = json.loads(request.body)
-        print(json.dumps(data, indent=4))
         user = authenticate(
             request,
             username = data['username'],
@@ -30,7 +30,7 @@ def login(request):
             return JsonResponse({'error': 'Invalid username or password'}, status=401)
         else:
             auth_login(request, user)
-            return JsonResponse({'message': 'Login Successful'}, status=200)
+            return JsonResponse({'message': 'User logged in successfully'}, status=200)
 
 @login_required
 def logout(request):
@@ -39,4 +39,10 @@ def logout(request):
 
 @login_required
 def check_auth(request):
-    return JsonResponse({'username': request.user.username}, status=200)
+    user = request.user
+    userprofile = UserProfile.objects.get(user=user)
+    response = {'username': user.get_username(),
+                'image': userprofile.image.url,
+                'cuisines': userprofile.cuisines,}
+
+    return JsonResponse(response, status=200)

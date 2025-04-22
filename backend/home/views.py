@@ -7,9 +7,6 @@ from rest_framework.response import Response
 from .models import Visit
 from .serializers import VisitSerializer
 
-# Existing async view
-async def home(request):
-    return await render_nextjs_page(request)
 
 # API view for user visits
 @api_view(['GET'])

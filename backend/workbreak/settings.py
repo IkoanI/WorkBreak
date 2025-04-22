@@ -28,9 +28,7 @@ SECRET_KEY = 'django-insecure-_+*dvh_yn(98jl8-2frj_9eca)0sd@!)atp3ydhti2+dw#!jo3
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['*']  # Allows access from any IP for development
-# If you want to be more secure:
-# ALLOWED_HOSTS = ['localhost', '127.0.0.1', '192.168.X.X']  # replace with your LAN IP
+ALLOWED_HOSTS = []
 
 
 # Application definition
@@ -47,7 +45,10 @@ INSTALLED_APPS = [
     'corsheaders',
     'workbreak',
     'accounts',
-    'home'
+    'home',
+    'user',
+    'restaurants',
+    'django_cleanup.apps.CleanupConfig',
 ]
 
 MIDDLEWARE = [
@@ -129,14 +130,37 @@ USE_TZ = True
 
 STATIC_URL = 'static/'
 
+MEDIA_URL = 'media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-CORS_ALLOW_ALL_ORIGINS = True  # Allows all origins for development
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:8000",
+    "http://localhost:3000",
+]
+
+CORS_ALLOW_CREDENTIALS = True
+
+CSRF_COOKIE_HTTPONLY = False
+
+CSRF_TRUSTED_ORIGINS = ["http://localhost:8000", "http://localhost:3000",]
+
+NEXTJS_DEV_MODE = True
+NEXTJS_DEV_CMD  = "npm run dev"
+NEXTJS_DEV_ADDR = "http://localhost:3000"
 
 APPEND_SLASH = False
 
 LOGIN_URL = "/accounts/login"
 
+EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+EMAIL_HOST = "smtp.gmail.com"
+EMAIL_USE_TLS = True
+EMAIL_PORT = 587
+EMAIL_HOST_USER = "cs2340group3@gmail.com"
+EMAIL_HOST_PASSWORD = os.getenv("CS2340_Gmail_App_Password")

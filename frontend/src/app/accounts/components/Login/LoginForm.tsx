@@ -1,22 +1,23 @@
 'use client';
 
-import React, {useState, useContext} from 'react';
+import React, {useState} from 'react';
 import { getCookie } from 'typescript-cookie';
 import { redirect } from "next/navigation";
 import LoginInput from "./LoginInput";
 import "./LoginForm.css";
-import {UserContext} from "@/app/layout";
+import Link from "next/link";
+import {BACKEND_ENDPOINT, useAppContext} from "@/app/AppContext";
 
 export default function LoginForm() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [errors, setErrors] = useState();
-  const { setUser } = useContext(UserContext);
+  const {setIsAuthenticated} = useAppContext()
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    const response = await fetch('/accounts/api/login', {
+    const response = await fetch(`${BACKEND_ENDPOINT}/accounts/api/login`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -29,11 +30,8 @@ export default function LoginForm() {
     const data = await response.json();
 
     if (response.ok) {
-      setUser({
-        username: username,
-        isAuthenticated: true
-      })
-      redirect('/');
+      setIsAuthenticated(true);
+      redirect('/home');
     } else {
       setErrors(data);
     }
@@ -64,7 +62,7 @@ export default function LoginForm() {
         />
 
         <div className = "login-forgot">
-          <a href = "#" className = "login-link">
+          <a href = {`${BACKEND_ENDPOINT}/accounts/password_reset/`} className = "login-link">
             Forgot password?
           </a>
         </div>
@@ -76,10 +74,11 @@ export default function LoginForm() {
 
       <div className = "login-footer">
         <p>
-          Don't have an account?{" "}
-          <a href = "/accounts/signup" className = "login-link">
+          Don&#39;t have an account?{" "}
+
+          <Link href = "/accounts/signup" className = "login-link">
             Sign up
-          </a>
+          </Link>
         </p>
       </div>
     </div>
