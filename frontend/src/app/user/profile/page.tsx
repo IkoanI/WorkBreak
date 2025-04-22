@@ -197,7 +197,8 @@ export default function ProfilePage() {
                     ))}
                   </div>
 
-                  <a href = "/accounts/logout/"><span> Logout </span></a>
+                  <a href = "/accounts/logout/" className = "logout-button">
+                    <span> Logout </span></a>
                 </div>
 
                 {isEditing && (
