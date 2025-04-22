@@ -18,6 +18,7 @@ export default function FilterForm({destination} : Props) {
     const [formData, setFormData] = useState({cuisine: "", distance: "", budget: ""});
     const [isLoading, setIsLoading] = useState(false);
     const [loadStartMap, setLoadStartMap] = useState(true);
+    const [query, setQuery] = useState("");
 
     const onFinish = () => {
         // @ts-ignore
