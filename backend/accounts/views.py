@@ -32,13 +32,17 @@ def login(request):
             auth_login(request, user)
             return JsonResponse({'message': 'User logged in successfully'}, status=200)
 
+    return JsonResponse({'error': 'Invalid request method'}, status=405)
+
 @login_required
 def logout(request):
     auth_logout(request)
     return redirect('home.index')
 
-@login_required
 def check_auth(request):
+    if not request.user.is_authenticated:
+        return JsonResponse({'message': 'User not logged in'}, status=400)
+
     user = request.user
     userprofile = UserProfile.objects.get(user=user)
     response = {'username': user.get_username(),

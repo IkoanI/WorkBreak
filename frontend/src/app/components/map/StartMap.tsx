@@ -1,7 +1,7 @@
 "use client";
 
-import React, { useEffect, useState} from "react";
-import { mapsLibrary, markerLibrary } from "@/app/AppContext";
+import React, { useEffect } from "react";
+import {useAppContext} from "@/app/AppContext";
 
 type Props = {
   destination: { lat: number; lng: number };
@@ -12,12 +12,15 @@ const containerStyle = {
   height: '400px',
 };
 
-export default function homeMap({destination} : Props) {
-
+export default function HomeMap({destination} : Props) {
+    const {googleMapsLibrary} = useAppContext();
+    
     const mapRef = React.useRef(null);
 
     useEffect(() => {
         const initMap = async () => {
+            
+            if (!googleMapsLibrary) return;
 
             const mapOptions: google.maps.MapOptions = {
                 center: destination,
@@ -25,9 +28,9 @@ export default function homeMap({destination} : Props) {
                 mapId: 'HOME_MAP'
             }
 
-            const map = new mapsLibrary.Map(mapRef.current as unknown as HTMLDivElement, mapOptions);
+            const map = new googleMapsLibrary.mapsLibrary.Map(mapRef.current as unknown as HTMLDivElement, mapOptions);
 
-            const marker = new markerLibrary.AdvancedMarkerElement({
+            const marker = new googleMapsLibrary.markerLibrary.AdvancedMarkerElement({
                 map: map,
                 position: destination,
                 title: 'Start Location'
@@ -35,7 +38,7 @@ export default function homeMap({destination} : Props) {
         }
 
         initMap();
-    }, []);
+    }, [destination, googleMapsLibrary]);
 
     return (
         <div style={containerStyle} ref={mapRef} />

@@ -2,22 +2,21 @@
 import React, {createContext, useContext, useEffect, useState} from 'react';
 import {Loader} from "@googlemaps/js-api-loader";
 
-// CHANGE IN PRODUCTION
 export const BACKEND_ENDPOINT = process.env.NEXT_PUBLIC_BACKEND_API_ENDPOINT
-
 export const default_image_url = BACKEND_ENDPOINT + "/media/workbreak.png"
 
+// GOOGLE MAPS API STUFF
 const loader = new Loader({
     apiKey: process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY!,
     version: 'weekly'
 });
 
-
-export const  placesLibrary = await loader.importLibrary('places');
-
-export const  markerLibrary = await loader.importLibrary('marker');
-
-export const  mapsLibrary = await loader.importLibrary('maps');
+type GoogleMapsLibrary = {
+    placesLibrary : google.maps.PlacesLibrary,
+    markerLibrary : google.maps.MarkerLibrary,
+    mapsLibrary : google.maps.MapsLibrary,
+    priceLevel : typeof google.maps.places.PriceLevel,
+}
 
 export type User = {
     username : string;
@@ -36,6 +35,7 @@ type AppContextType = {
     setUser:(user: User) => void;
     isAuthenticated: boolean;
     setIsAuthenticated:(isAuthenticated: boolean) => void;
+    googleMapsLibrary: GoogleMapsLibrary | null;
 };
 
 type ContextProviderProps = {
@@ -47,7 +47,8 @@ export const AppContext = createContext<AppContextType>(
         user: defaultUser,
         setUser: () => {},
         isAuthenticated:false,
-        setIsAuthenticated: () => {}
+        setIsAuthenticated: () => {},
+        googleMapsLibrary:null
     }
 )
 
@@ -56,6 +57,7 @@ export const useAppContext = () => useContext(AppContext);
 export const ContextProvider = ({ children }: ContextProviderProps) => {
   const [user, setUser] = useState(defaultUser);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [googleMapsLibrary, setGoogleMapsLibrary] = useState<GoogleMapsLibrary | null>(null);
 
   useEffect(() => {
       async function check_auth() {
@@ -77,8 +79,22 @@ export const ContextProvider = ({ children }: ContextProviderProps) => {
       check_auth();
     }, [isAuthenticated, setIsAuthenticated, setUser])
 
+  useEffect(() => {
+      async function on_mount() {
+            if (!googleMapsLibrary) {
+                const placesLibrary = await loader.importLibrary('places');
+                const markerLibrary = await loader.importLibrary('marker');
+                const mapsLibrary = await loader.importLibrary('maps');
+                const priceLevel = google.maps.places.PriceLevel;
+                setGoogleMapsLibrary({placesLibrary, markerLibrary, mapsLibrary, priceLevel});
+            }
+        }
+
+        on_mount();
+    }, [googleMapsLibrary]);
+  
   return (
-      <AppContext.Provider value={{user, setUser, isAuthenticated, setIsAuthenticated}}>
+      <AppContext.Provider value={{user, setUser, isAuthenticated, setIsAuthenticated, googleMapsLibrary}}>
           {children}
       </AppContext.Provider>
   );

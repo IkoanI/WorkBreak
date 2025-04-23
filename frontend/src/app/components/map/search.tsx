@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
-import Latlon, { Dms } from 'geodesy/latlon-ellipsoidal-vincenty'
+import Latlon from 'geodesy/latlon-ellipsoidal-vincenty'
 import PriceLevel = google.maps.places.PriceLevel;
-import { mapsLibrary, markerLibrary, placesLibrary } from "@/app/AppContext";
+import { useAppContext } from "@/app/AppContext";
 
 type Props = {
     position: {lat: number, lng: number},
@@ -15,8 +15,12 @@ const containerStyle = {
 
 export default function Search (data : Props) {
     const mapRef = React.useRef(null);
+    const { googleMapsLibrary } = useAppContext();
+    
     useEffect(() => {
         const search = async () => {
+            if (!googleMapsLibrary) return;
+            
             let cuisine;
             if (data.formData.cuisine == null) {
                 cuisine = 'food';
@@ -38,10 +42,10 @@ export default function Search (data : Props) {
                 zoom: 15,
                 mapId: 'Search_Map'
             }
-            const map =  (new (mapsLibrary.Map)(mapRef.current as unknown as HTMLDivElement, mapOptions));
+            const map =  (new (googleMapsLibrary.mapsLibrary.Map)(mapRef.current as unknown as HTMLDivElement, mapOptions));
 
-            const { places } = await placesLibrary.Place.searchByText(request);
-            const infoWindow = new (mapsLibrary.InfoWindow);
+            const { places } = await googleMapsLibrary.placesLibrary.Place.searchByText(request);
+            const infoWindow = new (googleMapsLibrary.mapsLibrary.InfoWindow);
             const distance = Number(data.formData.distance) * 1609.344;
 
             if (places.length) {
@@ -57,20 +61,18 @@ export default function Search (data : Props) {
                     console.log(dist);
                     console.log(place.priceLevel);
                     if (distance >= dist) {
-                        const marker = (new (markerLibrary.AdvancedMarkerElement)({
+                        const marker = (new (googleMapsLibrary.markerLibrary.AdvancedMarkerElement)({
                             map,
                             position: place.location,
                             title: place.displayName,
                         }))
-                        let infoWindowNode = document.createElement("div");
-                        let text = document.createElement("div");
+                        const infoWindowNode = document.createElement("div");
+                        const text = document.createElement("div");
                         text.innerText = place.displayName + '\n' + place.formattedAddress + '\n' +
                             place.priceLevel + '\n' + place.rating + '\n' + place.id;
                         infoWindowNode.appendChild(text);
-
-                        // @ts-ignore
-                        marker.addListener('click', ({domEvent, latLng}) => {
-                            const {target} = domEvent;
+                        
+                        marker.addListener('click', () => {
                             infoWindow.close();
                             infoWindow.setContent(infoWindowNode);
                             infoWindow.open(marker.map, marker);
@@ -85,7 +87,7 @@ export default function Search (data : Props) {
             }
         }
         search();
-    }, []);
+    }, [data, googleMapsLibrary]);
 
     return (
         <div style={containerStyle} ref={mapRef} />

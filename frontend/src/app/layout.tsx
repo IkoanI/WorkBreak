@@ -8,6 +8,7 @@ import Head from "./templateComponents/head/head";
 import Footer from "./templateComponents/footer";
 import Header from "./templateComponents/header";
 import {ContextProvider} from "@/app/AppContext";
+import React from "react";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
