@@ -34,12 +34,6 @@
   gap: 1rem;
 }
 
-.signup-input-group {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-}
-
 .signup-label {
   font-size: 0.875rem;
   font-weight: 500;

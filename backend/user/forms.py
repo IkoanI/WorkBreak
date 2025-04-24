@@ -1,15 +1,14 @@
 from django import forms
 
-from django.contrib.auth.models import User
-
-from user.models import UserProfile
+from accounts.models import WorkBreakUser
+from user.models import UserProfile, RestaurantProfile
 
 
 class UpdateUserForm(forms.ModelForm):
     username = forms.CharField(max_length=150, required=True,)
 
     class Meta:
-        model = User
+        model = WorkBreakUser
         fields = ['username']
 
 

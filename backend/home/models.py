@@ -1,8 +1,11 @@
 from django.contrib.auth.models import User
 from django.db import models
 
+from accounts.models import WorkBreakUser
+
+
 class Visit(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    user = models.ForeignKey(WorkBreakUser, on_delete=models.CASCADE)
     restaurant_name = models.CharField(max_length=200)
     visited_at = models.DateTimeField(auto_now_add=True)
 

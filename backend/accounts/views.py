@@ -3,17 +3,19 @@ from django.contrib.auth import login as auth_login, authenticate, logout as aut
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 import json
-from user.models import UserProfile
+from user.models import UserProfile, RestaurantProfile
 from .forms import CustomUserCreationForm
 # Create your views here.
 def signup(request):
     if request.method == 'POST':
         data = json.loads(request.body)
+        print(data)
         form = CustomUserCreationForm(data)
         if form.is_valid():
             form.save()
             return JsonResponse({'message': 'User created successfully'}, status=201)
         else:
+            print(form.errors)
             return JsonResponse(form.errors, status=400)
 
     return JsonResponse({'error': 'Invalid request method'}, status=405)
@@ -44,9 +46,16 @@ def check_auth(request):
         return JsonResponse({'message': 'User not logged in'}, status=400)
 
     user = request.user
-    userprofile = UserProfile.objects.get(user=user)
-    response = {'username': user.get_username(),
-                'image': userprofile.image.url,
-                'cuisines': userprofile.cuisines,}
+    response = {'username': user.get_username(),}
+    if user.is_restaurant:
+        restaurant_profile = RestaurantProfile.objects.get(user=user)
+        response['is_restaurant'] = True
+        response['restaurant_name'] = restaurant_profile.restaurant_name
+        response['place_id'] = restaurant_profile.place_id
+    else:
+        user_profile = UserProfile.objects.get(user=user)
+        response['is_restaurant'] = False
+        response['image'] = user_profile.image.url
+        response['cuisines'] = user_profile.cuisines
 
     return JsonResponse(response, status=200)

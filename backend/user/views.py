@@ -1,5 +1,6 @@
 from django.contrib.auth.decorators import login_required
 import json
+
 from django_nextjs.render import render_nextjs_page
 from django.http import JsonResponse
 from rest_framework.parsers import MultiPartParser, FileUploadParser
@@ -43,6 +44,5 @@ class UpdateUserProfileAPIView(APIView):
             serializer.save()
             return Response(data=serializer.data, status=200)
 
-        print(serializer.errors)
         return Response(data=serializer.errors, status=500)
 

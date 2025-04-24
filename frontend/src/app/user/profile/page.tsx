@@ -112,6 +112,10 @@ export default function ProfilePage() {
     setErrors({"username":""});
   }
 
+  if (user.is_restaurant) {
+    return (<a href = "/accounts/logout/" className = "logout-button"><span> Logout </span></a>)
+  }
+
   return (
     <div className="profile-page">
       <main className="profile-main">

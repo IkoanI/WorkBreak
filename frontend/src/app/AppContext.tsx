@@ -22,12 +22,16 @@ export type User = {
     username : string;
     image: string;
     cuisines: string[];
+    is_restaurant: boolean;
+    restaurant_name: string;
 }
 
 export const defaultUser = {
     username : "",
     image : "",
-    cuisines : new Array<string>()
+    cuisines : new Array<string>(),
+    is_restaurant: false,
+    restaurant_name: "",
 }
 
 type AppContextType = {
@@ -64,7 +68,8 @@ export const ContextProvider = ({ children }: ContextProviderProps) => {
           const response = await fetch(BACKEND_ENDPOINT + "/accounts/api/check_auth");
           const data = await response.json();
           if (response.ok) {
-            setUser({username : data['username'], image: BACKEND_ENDPOINT + data['image'], cuisines : data['cuisines']});
+            setUser({...defaultUser, ...data, image: BACKEND_ENDPOINT + data.image});
+
             if (!isAuthenticated) {
                 setIsAuthenticated(true);
             }
@@ -77,7 +82,7 @@ export const ContextProvider = ({ children }: ContextProviderProps) => {
       }
 
       check_auth();
-    }, [isAuthenticated, setIsAuthenticated, setUser])
+    }, [isAuthenticated, setIsAuthenticated])
 
   useEffect(() => {
       async function on_mount() {

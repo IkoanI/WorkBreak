@@ -6,7 +6,8 @@ import { redirect } from "next/navigation";
 import SignupInput from "./SignupInput";
 import "./SignupForm.css";
 import Link from "next/link";
-import {BACKEND_ENDPOINT} from "@/app/AppContext";
+import {BACKEND_ENDPOINT, useAppContext} from "@/app/AppContext";
+import AsyncSelect from "react-select/async";
 
 /*
    IM NOT GOOD WITH TYPESCRIPT, PROBABLY VIOLATING A BUNCH OF BEST PRACTICES
@@ -17,6 +18,10 @@ export default function SignupForm() {
   const [password1, setPassword1] = useState('');
   const [password2, setPassword2] = useState('');
   const [email, setEmail] = useState('');
+  const [is_restaurant, setIsRestaurant] = useState(false);
+  const [restaurant_name, setRestaurantName] = useState('');
+  const [place_id, setPlaceID] = useState('');
+  const { googleMapsLibrary } = useAppContext();
   const [errors, setErrors] = useState();
 
 
@@ -29,18 +34,39 @@ export default function SignupForm() {
         'Content-Type': 'application/json',
         'X-CSRFToken': getCookie('csrftoken') || '',
       },
-      body: JSON.stringify({ username, email, password1, password2 }),
+      body: JSON.stringify({ username, email, password1, password2, is_restaurant, restaurant_name, place_id }),
       credentials: 'include',
     });
 
     const data = await response.json();
-
     if (response.ok) {
       redirect('/accounts/login');
     } else {
       setErrors(data);
     }
   };
+
+  const loadOptions = async (inputValue: string) => {
+    const request = {
+            textQuery: inputValue,
+            fields: ["displayName",  "formattedAddress", "id"],
+            includedType: "restaurant",
+            useStrictTypeFiltering: true,
+    }
+
+    if (!googleMapsLibrary || !window.google?.maps?.places?.Place || !request) return [];
+
+    const response = await googleMapsLibrary.placesLibrary.Place.searchByText(request);
+    return response.places.map(place => ({
+      value: place.id,
+      label: `${place.displayName} (${place.formattedAddress})`
+    }));
+  }
+
+  const handleRestaurantChange = (e: { label: React.SetStateAction<string>; value: React.SetStateAction<string>; } | null) => {
+    setRestaurantName(e == null ? "" : e.label)
+    setPlaceID(e == null ? '' : e.value)
+  }
 
   // ERROR MESSAGES NEED STYLING
   return (
@@ -50,7 +76,6 @@ export default function SignupForm() {
       </div>
 
       <h1 className = "signup-title"> Create Your Account </h1>
-
       <form onSubmit = {handleSubmit} className = "signup-form">
         {errors != undefined && errors["username"] && <p>{errors["username"]}</p>}
         <SignupInput
@@ -83,6 +108,28 @@ export default function SignupForm() {
           value = {password2}
           onChange = {(e) => setPassword2(e.target.value)}
         />
+
+        {errors != undefined && errors["place_id"] && <p>{errors["place_id"]}</p>}
+        {is_restaurant &&
+            <div className = "signup-input-group" >
+              <label className="signup-label">
+              Restaurant Name:
+              <AsyncSelect loadOptions={loadOptions}
+                onChange={handleRestaurantChange}
+                placeholder=""
+                className="search-input-container"
+                classNamePrefix="search-input"
+                defaultInputValue={restaurant_name}
+                />
+            </label>
+            </div>
+
+            }
+
+        <label>
+          I am a restaurant: <input type = "checkbox" checked={is_restaurant} onChange = {(e) => setIsRestaurant(e.target.checked)} />
+        </label>
+
 
         <button type = "submit" className = "signup-button">
           Sign Up
