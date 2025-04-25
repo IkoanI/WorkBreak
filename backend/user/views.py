@@ -1,6 +1,7 @@
 from django.contrib.auth.decorators import login_required
 import json
 
+from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
 from django_nextjs.render import render_nextjs_page
 from django.http import JsonResponse
@@ -34,11 +35,11 @@ def update_user(request):
 
     return JsonResponse({'error': 'Invalid request method'}, status=405)
 
+@method_decorator(csrf_exempt, name='dispatch')
 class UpdateUserProfileAPIView(APIView):
     permission_classes = (IsAuthenticated, )
     parser_classes = [MultiPartParser, FileUploadParser]
 
-    @csrf_exempt
     def post(self, request):
         user_profile = UserProfile.objects.get(user=request.user)
         serializer = UserProfileSerializer(instance=user_profile, data=request.data)
