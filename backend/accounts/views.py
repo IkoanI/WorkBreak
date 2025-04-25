@@ -1,7 +1,9 @@
+import os
+
 from django.shortcuts import redirect
 from django.contrib.auth import login as auth_login, authenticate, logout as auth_logout
 from django.contrib.auth.decorators import login_required
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponse
 import json
 from user.models import UserProfile, RestaurantProfile
 from .forms import CustomUserCreationForm
@@ -36,8 +38,11 @@ def login(request):
 
 @login_required
 def logout(request):
-    auth_logout(request)
-    return redirect('home.index')
+    try:
+        auth_logout(request)
+        return JsonResponse({'message': 'User logged out successfully'}, status=200)
+    except:
+        return JsonResponse({'error': 'Logout failed!'}, status=400)
 
 def check_auth(request):
     if not request.user.is_authenticated:
