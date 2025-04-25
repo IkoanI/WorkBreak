@@ -9,13 +9,11 @@ from .forms import CustomUserCreationForm
 def signup(request):
     if request.method == 'POST':
         data = json.loads(request.body)
-        print(data)
         form = CustomUserCreationForm(data)
         if form.is_valid():
             form.save()
             return JsonResponse({'message': 'User created successfully'}, status=201)
         else:
-            print(form.errors)
             return JsonResponse(form.errors, status=400)
 
     return JsonResponse({'error': 'Invalid request method'}, status=405)

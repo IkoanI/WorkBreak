@@ -114,6 +114,12 @@ AUTH_PASSWORD_VALIDATORS = [
 
 AUTH_USER_MODEL = "accounts.WorkBreakUser"
 
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.SessionAuthentication',
+    ]
+}
+
 # Internationalization
 # https://docs.djangoproject.com/en/5.1/topics/i18n/
 
@@ -130,7 +136,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
 
 STATIC_URL = 'static/'
-STATIC_ROOT = os.path.join(BASE_DIR, '/backend/static')
+STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 MEDIA_URL = 'media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
@@ -154,10 +160,6 @@ CSRF_TRUSTED_ORIGINS = ["http://localhost:8000", "http://localhost:3000", "http:
 NEXTJS_DEV_MODE = True
 NEXTJS_DEV_CMD  = "npm run dev"
 NEXTJS_DEV_ADDR = "http://localhost:3000"
-
-NEXTJS_SETTINGS = {
-    "nextjs_server_url": "https://work-break.vercel.app",
-}
 
 APPEND_SLASH = False
 

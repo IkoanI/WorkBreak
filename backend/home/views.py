@@ -34,7 +34,3 @@ def location_details(request, location_id):
         return Response(response.json())
     except requests.RequestException as e:
         return Response({"error": str(e)}, status=response.status_code)
-
-@ensure_csrf_cookie
-def get_csrf_token(request):
-    return HttpResponse("CSRF cookie set")
