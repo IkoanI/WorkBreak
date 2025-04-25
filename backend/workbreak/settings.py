@@ -28,7 +28,7 @@ SECRET_KEY = 'django-insecure-_+*dvh_yn(98jl8-2frj_9eca)0sd@!)atp3ydhti2+dw#!jo3
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -130,7 +130,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
 
 STATIC_URL = 'static/'
-
+STATIC_ROOT = os.path.join(BASE_DIR, '/backend/static')
 MEDIA_URL = 'media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
@@ -143,13 +143,13 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:8000",
     "http://localhost:3000",
+    "http://127.0.0.1:3000",
 ]
 
 CORS_ALLOW_CREDENTIALS = True
 
 CSRF_COOKIE_HTTPONLY = False
-
-CSRF_TRUSTED_ORIGINS = ["http://localhost:8000", "http://localhost:3000", "https://work-break.vercel.app"]
+CSRF_TRUSTED_ORIGINS = ["http://localhost:8000", "http://localhost:3000", "http://127.0.0.1:3000", "https://work-break.vercel.app"]
 
 NEXTJS_DEV_MODE = True
 NEXTJS_DEV_CMD  = "npm run dev"
