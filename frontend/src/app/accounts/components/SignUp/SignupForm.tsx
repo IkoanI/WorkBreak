@@ -76,7 +76,7 @@ export default function SignupForm() {
       </div>
 
       <h1 className = "signup-title"> Create Your Account </h1>
-      <form onSubmit = {handleSubmit} className = "signup-form">
+      <form onSubmit = {handleSubmit} className = "signup-form" method="POST">
         {errors != undefined && errors["username"] && <p>{errors["username"]}</p>}
         <SignupInput
           label = "Username:"

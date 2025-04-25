@@ -7,6 +7,7 @@ import { Camera, Check } from "lucide-react"
 import "./styles.css"
 import {BACKEND_ENDPOINT, default_image_url, useAppContext, User} from "@/app/AppContext";
 import {getCookie} from "typescript-cookie";
+import LogoutButton from "@/app/user/components/LogoutButton";
 
 const cuisineOptions = [
     { id: "chinese", label: "Chinese" },
@@ -113,7 +114,7 @@ export default function ProfilePage() {
   }
 
   if (user.is_restaurant) {
-    return (<a href = "/accounts/logout/" className = "logout-button"><span> Logout </span></a>)
+    return (<LogoutButton/>)
   }
 
   return (
@@ -200,9 +201,6 @@ export default function ProfilePage() {
                       </div>
                     ))}
                   </div>
-
-                  <a href = "/accounts/logout/" className = "logout-button">
-                    <span> Logout </span></a>
                 </div>
 
                 {isEditing && (
@@ -224,6 +222,7 @@ export default function ProfilePage() {
                   </div>
                 )}
               </form>
+              <LogoutButton />
             </div>
           </div>
         </div>

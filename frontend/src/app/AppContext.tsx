@@ -65,7 +65,10 @@ export const ContextProvider = ({ children }: ContextProviderProps) => {
 
   useEffect(() => {
       async function check_auth() {
-          const response = await fetch(BACKEND_ENDPOINT + "/accounts/api/check_auth");
+          const response = await fetch(`${BACKEND_ENDPOINT}/accounts/api/check_auth`,{
+              credentials: 'include',
+          });
+
           const data = await response.json();
           if (response.ok) {
             setUser({...defaultUser, ...data, image: BACKEND_ENDPOINT + data.image});
@@ -93,9 +96,9 @@ export const ContextProvider = ({ children }: ContextProviderProps) => {
                 const priceLevel = google.maps.places.PriceLevel;
                 setGoogleMapsLibrary({placesLibrary, markerLibrary, mapsLibrary, priceLevel});
             }
-        }
+      }
 
-        on_mount();
+      on_mount();
     }, [googleMapsLibrary]);
   
   return (

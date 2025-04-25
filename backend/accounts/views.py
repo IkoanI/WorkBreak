@@ -1,12 +1,10 @@
-import os
-
-from django.shortcuts import redirect
 from django.contrib.auth import login as auth_login, authenticate, logout as auth_logout
 from django.contrib.auth.decorators import login_required
-from django.http import JsonResponse, HttpResponse
+from django.http import JsonResponse
 import json
 from user.models import UserProfile, RestaurantProfile
 from .forms import CustomUserCreationForm
+from django.views.decorators.csrf import ensure_csrf_cookie
 # Create your views here.
 def signup(request):
     if request.method == 'POST':
@@ -43,7 +41,7 @@ def logout(request):
         return JsonResponse({'message': 'User logged out successfully'}, status=200)
     except:
         return JsonResponse({'error': 'Logout failed!'}, status=400)
-
+@ensure_csrf_cookie
 def check_auth(request):
     if not request.user.is_authenticated:
         return JsonResponse({'message': 'User not logged in'}, status=400)
