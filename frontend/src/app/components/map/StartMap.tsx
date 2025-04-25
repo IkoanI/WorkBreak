@@ -20,21 +20,21 @@ export default function HomeMap({destination} : Props) {
     useEffect(() => {
         const initMap = async () => {
             
-            if (!googleMapsLibrary) return;
-
-            const mapOptions: google.maps.MapOptions = {
-                center: destination,
-                zoom: 15,
-                mapId: 'HOME_MAP'
-            }
-
-            const map = new googleMapsLibrary.mapsLibrary.Map(mapRef.current as unknown as HTMLDivElement, mapOptions);
-
-            const marker = new googleMapsLibrary.markerLibrary.AdvancedMarkerElement({
-                map: map,
-                position: destination,
-                title: 'Start Location'
-            });
+            // if (!googleMapsLibrary) return;
+            //
+            // const mapOptions: google.maps.MapOptions = {
+            //     center: destination,
+            //     zoom: 15,
+            //     mapId: 'HOME_MAP'
+            // }
+            //
+            // const map = new googleMapsLibrary.mapsLibrary.Map(mapRef.current as unknown as HTMLDivElement, mapOptions);
+            //
+            // const marker = new googleMapsLibrary.markerLibrary.AdvancedMarkerElement({
+            //     map: map,
+            //     position: destination,
+            //     title: 'Start Location'
+            // });
         }
 
         initMap();
