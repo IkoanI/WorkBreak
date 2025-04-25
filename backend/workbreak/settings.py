@@ -163,9 +163,6 @@ NEXTJS_DEV_ADDR = "http://localhost:3000"
 
 APPEND_SLASH = False
 
-LOGIN_URL =  f"{os.environ.get("FRONTEND_URL")}/accounts/login"
-LOGOUT_URL = f"{os.environ.get("FRONTEND_URL")}/home"
-
 EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
 EMAIL_HOST = "smtp.gmail.com"
 EMAIL_USE_TLS = True

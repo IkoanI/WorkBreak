@@ -1,6 +1,7 @@
 from django.contrib.auth.decorators import login_required
 import json
 
+from django.views.decorators.csrf import csrf_exempt
 from django_nextjs.render import render_nextjs_page
 from django.http import JsonResponse
 from rest_framework.parsers import MultiPartParser, FileUploadParser
@@ -37,6 +38,7 @@ class UpdateUserProfileAPIView(APIView):
     permission_classes = (IsAuthenticated, )
     parser_classes = [MultiPartParser, FileUploadParser]
 
+    @csrf_exempt
     def post(self, request):
         user_profile = UserProfile.objects.get(user=request.user)
         serializer = UserProfileSerializer(instance=user_profile, data=request.data)
