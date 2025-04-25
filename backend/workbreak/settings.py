@@ -149,11 +149,15 @@ CORS_ALLOW_CREDENTIALS = True
 
 CSRF_COOKIE_HTTPONLY = False
 
-CSRF_TRUSTED_ORIGINS = ["http://localhost:8000", "http://localhost:3000",]
+CSRF_TRUSTED_ORIGINS = ["http://localhost:8000", "http://localhost:3000", "https://work-break.vercel.app"]
 
 NEXTJS_DEV_MODE = True
 NEXTJS_DEV_CMD  = "npm run dev"
 NEXTJS_DEV_ADDR = "http://localhost:3000"
+
+NEXTJS_SETTINGS = {
+    "nextjs_server_url": "https://work-break.vercel.app",
+}
 
 APPEND_SLASH = False
 
