@@ -74,8 +74,10 @@ export const ContextProvider = ({ children }: ContextProviderProps) => {
           const data = await response.json();
           setCsrftoken(data.token);
           if (response.ok) {
-            setUser({...defaultUser, ...data, image: `${BACKEND_ENDPOINT}/${data.image}`});
-
+            if (data.image) {
+                data.image = `${BACKEND_ENDPOINT}/${data.image}`
+            }
+            setUser({...defaultUser, ...data,});
             if (!isAuthenticated) {
                 setIsAuthenticated(true);
             }

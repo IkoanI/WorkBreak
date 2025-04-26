@@ -145,14 +145,18 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-# CORS_ALLOWED_ORIGINS = [
-#     "http://localhost:8000",
-#     "http://localhost:3000",
-#     "http://127.0.0.1:3000",
-#     "https://workbreak.pythonanywhere.com",
-#     "http://127.0.0.1:8000",
-#     "https://work-break.vercel.app"
-# ]
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:8000",
+    "http://localhost:3000",
+    "https://localhost:8000",
+    "https://localhost:3000",
+    "http://127.0.0.1:3000",
+    "http://127.0.0.1:8000",
+    "https://127.0.0.1:3000",
+    "https://127.0.0.1:8000",
+    "https://work-break.vercel.app",
+    "https://workbreak.pythonanywhere.com"
+]
 
 SECURE_REFERRER_POLICY = "strict-origin-when-cross-origin"
 CORS_ALLOW_ALL_ORIGINS = True
@@ -163,7 +167,18 @@ SESSION_COOKIE_SAMESITE = "None"
 CSRF_COOKIE_SAMESITE = "None"
 CORS_ALLOW_CREDENTIALS = True
 
-CSRF_TRUSTED_ORIGINS = ["http://localhost:8000", "http://localhost:3000", "http://127.0.0.1:3000", "http://127.0.0.1:8000", "https://work-break.vercel.app", "https://workbreak.pythonanywhere.com"]
+CSRF_TRUSTED_ORIGINS = [
+    "http://localhost:8000",
+    "http://localhost:3000",
+    "https://localhost:8000",
+    "https://localhost:3000",
+    "http://127.0.0.1:3000",
+    "http://127.0.0.1:8000",
+    "https://127.0.0.1:3000",
+    "https://127.0.0.1:8000",
+    "https://work-break.vercel.app",
+    "https://workbreak.pythonanywhere.com"
+]
 
 NEXTJS_DEV_MODE = True
 NEXTJS_DEV_CMD  = "npm run dev"

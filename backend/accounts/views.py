@@ -60,7 +60,10 @@ def check_auth(request):
     else:
         user_profile = UserProfile.objects.get(user=user)
         response['is_restaurant'] = False
-        response['image'] = user_profile.image.url
+
+        if user_profile.image:
+            response['image'] = user_profile.image.url
+
         response['cuisines'] = user_profile.cuisines
 
     return JsonResponse(response, status=200)
