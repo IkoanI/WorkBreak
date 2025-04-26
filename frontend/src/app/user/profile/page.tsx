@@ -137,7 +137,7 @@ export default function ProfilePage() {
                 <div className="profile-details">
                   <div className="image-section">
                     <div className={`image-wrapper ${isEditing ? "editable" : ""}`} onClick={handleImageClick}>
-                      <Image src={newUser.image == "" ? default_image_url : newUser.image} alt="Profile" fill className="image" />
+                      <Image src={newUser.image == "" ? default_image_url : newUser.image} fill alt="Profile" className="image" />
                       {isEditing && (
                         <div className="image-overlay">
                           <Camera className="overlay-icon" size={32} />
