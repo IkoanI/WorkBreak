@@ -1,20 +1,19 @@
 'use client';
 
 import React from 'react';
-import { getCookie } from 'typescript-cookie';
 import { redirect } from "next/navigation";
 import "../profile/styles.css";
 import {BACKEND_ENDPOINT, useAppContext} from "@/app/AppContext";
 
 export default function LogoutButton() {
-  const {setIsAuthenticated} = useAppContext()
+  const {setIsAuthenticated, csrftoken} = useAppContext()
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     const response = await fetch(`${BACKEND_ENDPOINT}/accounts/logout`, {
       headers: {
-        'X-CSRFToken': getCookie('csrftoken') || ''
+        'X-CSRFToken': csrftoken || ''
       },
       credentials: 'include',
     });

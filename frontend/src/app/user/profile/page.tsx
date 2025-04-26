@@ -6,7 +6,6 @@ import Image from "next/image"
 import { Camera, Check } from "lucide-react"
 import "./styles.css"
 import {BACKEND_ENDPOINT, default_image_url, useAppContext, User} from "@/app/AppContext";
-import {getCookie} from "typescript-cookie";
 import LogoutButton from "@/app/user/components/LogoutButton";
 
 const cuisineOptions = [
@@ -29,6 +28,7 @@ export default function ProfilePage() {
   const [errors, setErrors] = useState({"username":""});
   const fileInputRef = useRef<HTMLInputElement>(null)
   const [newImage, setNewImage] = useState<File>();
+  const { csrftoken } = useAppContext();
 
   useEffect(() => {
     setNewUser(user);
@@ -67,7 +67,7 @@ export default function ProfilePage() {
     const updateUserResponse = await fetch(`${BACKEND_ENDPOINT}/user/api/update_user`, {
       method: 'POST',
       headers: {
-        'X-CSRFToken': getCookie('csrftoken') || '',
+        'X-CSRFToken': csrftoken || '',
         'Content-type': 'application/json'
       },
       body: JSON.stringify({"username":newUser.username}),
@@ -85,7 +85,7 @@ export default function ProfilePage() {
     const updateUserProfileResponse = await fetch(`${BACKEND_ENDPOINT}/user/api/update_profile`, {
       method: 'POST',
       headers: {
-        'X-CSRFToken': getCookie('csrftoken') || '',
+        'X-CSRFToken': csrftoken || '',
       },
       body: form_data,
       credentials: 'include',

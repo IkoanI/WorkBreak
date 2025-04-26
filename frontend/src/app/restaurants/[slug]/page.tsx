@@ -4,8 +4,7 @@ import "./styles.css";
 
 import { useParams } from 'next/navigation';
 import { useState, useEffect, FormEvent } from 'react';
-import { getCookie } from 'typescript-cookie';
-import { BACKEND_ENDPOINT } from "@/app/AppContext";
+import {BACKEND_ENDPOINT, useAppContext} from "@/app/AppContext";
 
 interface Restaurant {
   name: string;
@@ -27,6 +26,7 @@ export default function RestaurantPage() {
   const [reviews, setReviews] = useState<UserReviews[]>([]);
   const [rating, setRating] = useState(5);
   const [comment, setComment] = useState('');
+  const { csrftoken } = useAppContext();
 
   // restaurant
   useEffect(() => {
@@ -66,7 +66,7 @@ export default function RestaurantPage() {
         credentials: 'include',
         headers: {
           'Content-Type': 'application/json',
-          'X-CSRFToken': getCookie('csrftoken') || ''
+          'X-CSRFToken': csrftoken || ''
         },
         body: JSON.stringify({ rating, comment }),
       });

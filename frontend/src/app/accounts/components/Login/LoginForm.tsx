@@ -1,7 +1,6 @@
 'use client';
 
 import React, {useState} from 'react';
-import { getCookie } from 'typescript-cookie';
 import { redirect } from "next/navigation";
 import LoginInput from "./LoginInput";
 import "./LoginForm.css";
@@ -12,16 +11,15 @@ export default function LoginForm() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [errors, setErrors] = useState();
-  const {setIsAuthenticated} = useAppContext()
+  const {setIsAuthenticated, csrftoken} = useAppContext()
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
     const response = await fetch(`${BACKEND_ENDPOINT}/accounts/api/login`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'X-CSRFToken': getCookie('csrftoken') || ''
+        'X-CSRFToken': csrftoken || ''
       },
       body: JSON.stringify({ username, password }),
       credentials: 'include',
