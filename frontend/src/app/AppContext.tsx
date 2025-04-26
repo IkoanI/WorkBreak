@@ -15,6 +15,7 @@ type GoogleMapsLibrary = {
     placesLibrary : google.maps.PlacesLibrary,
     markerLibrary : google.maps.MarkerLibrary,
     mapsLibrary : google.maps.MapsLibrary,
+    routesLibrary : google.maps.RoutesLibrary,
     priceLevel : typeof google.maps.places.PriceLevel,
 }
 
@@ -98,8 +99,9 @@ export const ContextProvider = ({ children }: ContextProviderProps) => {
                 const placesLibrary = await loader.importLibrary('places');
                 const markerLibrary = await loader.importLibrary('marker');
                 const mapsLibrary = await loader.importLibrary('maps');
+                const routesLibrary = await loader.importLibrary('routes');
                 const priceLevel = google.maps.places.PriceLevel;
-                setGoogleMapsLibrary({placesLibrary, markerLibrary, mapsLibrary, priceLevel});
+                setGoogleMapsLibrary({placesLibrary, markerLibrary, mapsLibrary, routesLibrary, priceLevel});
             }
       }
 
