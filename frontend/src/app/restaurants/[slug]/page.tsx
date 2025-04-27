@@ -2,9 +2,11 @@
 
 import React, { useEffect, useState, FormEvent } from "react";
 import { useSearchParams } from 'next/navigation';
-import { useAppContext } from "@/app/AppContext";
+// import { useAppContext } from "@/app/AppContext";
 import { getCookie } from 'typescript-cookie';
 import "./styles.css";
+import TripadvisorReviews from "@/app/components/tripadvisor/TripadvisorReviews";
+import {BACKEND_ENDPOINT} from "@/app/AppContext";
 
 declare global {
   interface Window {
@@ -24,6 +26,7 @@ interface PlaceDetails {
   opening_hours?: { weekday_text?: string[] };
   website?: string;
   name?: string;
+  location?: google.maps.LatLng;
 }
 
 interface UserReview {
@@ -36,7 +39,7 @@ interface UserReview {
 export default function RestaurantPage() {
   const searchParams = useSearchParams();
   const placeId = searchParams.get("id");
-  const { user } = useAppContext();
+  // const { user } = useAppContext();
 
   const [placeDetails, setPlaceDetails] = useState<PlaceDetails | null>(null);
   const [error, setError] = useState(false);
@@ -54,7 +57,6 @@ export default function RestaurantPage() {
 
   useEffect(() => {
     if (!placeId || typeof window === "undefined" || !window.google?.maps) return;
-
     const service = new window.google.maps.places.PlacesService(document.createElement("div"));
     service.getDetails({ placeId }, (place, status) => {
       if (status === window.google.maps.places.PlacesServiceStatus.OK && place) {
@@ -72,8 +74,11 @@ export default function RestaurantPage() {
             weekday_text: place.opening_hours?.weekday_text || [] 
           },
           website: place.website || "",
-          name: place.name || ""
+          name: place.name || "",
+          location: place.geometry?.location || new google.maps.LatLng(0, 0)
         });
+
+        console.log(placeDetails);
       } else {
         setError(true);
       }
@@ -130,9 +135,9 @@ export default function RestaurantPage() {
     e.preventDefault();
     if (!placeDetails) return;
 
-    const slug = createSlug(placeDetails.name);
+    const slug = createSlug(placeDetails.name || '');
     try {
-      const res = await fetch(`/restaurants/api/${slug}/create_review/`, {
+      const res = await fetch(`${BACKEND_ENDPOINT}/restaurants/api/${slug}/create_review/`, {
         method: "POST",
         credentials: "include",
         headers: {
@@ -207,6 +212,8 @@ export default function RestaurantPage() {
           )}
         </div>
       </section>
+
+      <TripadvisorReviews restaurant_name={placeDetails.name || ''} coords={{lat:placeDetails.location?.lat() || 0, lng:placeDetails.location?.lng() || 0}}/>
 
       <section className="user-reviews-section">
         <h2>Leave Your Review</h2>

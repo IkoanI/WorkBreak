@@ -1,9 +1,12 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import FilterForm from "@/app/components/map/FilterForm";
+import React, {useEffect, useState} from "react";
+import FilterForm from '@/app/components/map/FilterForm';
+// import Image from "next/image";
+// import { useRouter } from "next/navigation";
 import { useAppContext } from "@/app/AppContext";
 import "./styles.css";
+// import {Eye, Star} from "lucide-react";
 
 export interface Restaurant {
   place_id: string;
@@ -20,8 +23,6 @@ export interface Restaurant {
 export default function DiscoverPage() {
   const { googleMapsLibrary } = useAppContext();
   const [coords, setCoords] = useState({ lat: 0, lng: 0 });
-  const [, setRestaurants] = useState<Restaurant[]>([]);
-  const [, setIsLoading] = useState(true);
 
   useEffect(() => {
     if (!navigator.geolocation) {
@@ -31,19 +32,13 @@ export default function DiscoverPage() {
     navigator.geolocation.getCurrentPosition(
       (position) => {
         setCoords({ lat: position.coords.latitude, lng: position.coords.longitude });
-        setIsLoading(false);
       },
       (err) => {
         console.error("Error getting location:", err);
-        setIsLoading(false);
       },
       { enableHighAccuracy: true, timeout: 5000, maximumAge: 0 }
     );
   }, []);
-
-  const handleRestaurantsFound = (results: Restaurant[]) => {
-    setRestaurants(results);
-  };
 
   return (
     <div className="discover-page">
@@ -53,11 +48,7 @@ export default function DiscoverPage() {
 
           {googleMapsLibrary ? (
             <div className="filter-form-wrapper">
-              <FilterForm
-                destination={coords}
-                onResultsFound={handleRestaurantsFound}
-                setIsLoading={setIsLoading}
-              />
+              <FilterForm destination={coords}/>
             </div>
           ) : (
             <p>Loading Google Maps library...</p>

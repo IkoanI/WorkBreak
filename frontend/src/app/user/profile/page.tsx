@@ -4,8 +4,8 @@ import React, { useEffect, useState, useRef } from "react"
 import Image from "next/image"
 import { Camera, Check } from "lucide-react"
 import "./styles.css"
-import { BACKEND_ENDPOINT, default_image_url, useAppContext, User } from "@/app/AppContext"
-import { getCookie } from "typescript-cookie"
+import {BACKEND_ENDPOINT, default_image_url, useAppContext, User} from "@/app/AppContext";
+import LogoutButton from "@/app/user/components/LogoutButton";
 
 const cuisineOptions = [
   { id: "chinese", label: "Chinese" },
@@ -28,13 +28,13 @@ const budgetOptions = [
 export default function ProfilePage() {
   const { user, setUser } = useAppContext()
   const [newUser, setNewUser] = useState<User>(user)
-  const [preferredBudget, setPreferredBudget] = useState<string>("MODERATE") // Local state
   const [isEditing, setIsEditing] = useState(false)
   const [isSaving, setIsSaving] = useState(false)
   const [saveSuccess, setSaveSuccess] = useState(false)
   const [errors, setErrors] = useState({ username: "" })
   const fileInputRef = useRef<HTMLInputElement>(null)
-  const [newImage, setNewImage] = useState<File>()
+  const [newImage, setNewImage] = useState<File>();
+  const { csrftoken } = useAppContext();
 
   useEffect(() => {
     setNewUser(user)
@@ -73,8 +73,8 @@ export default function ProfilePage() {
     const updateUserResponse = await fetch(`${BACKEND_ENDPOINT}/user/api/update_user`, {
       method: "POST",
       headers: {
-        "X-CSRFToken": getCookie("csrftoken") || "",
-        "Content-type": "application/json",
+        'X-CSRFToken': csrftoken || '',
+        'Content-type': 'application/json'
       },
       body: JSON.stringify({ username: newUser.username }),
       credentials: "include",
@@ -85,12 +85,13 @@ export default function ProfilePage() {
       form_data.append("image", newImage)
     }
 
-    form_data.append("cuisines", JSON.stringify(newUser.cuisines))
+    form_data.append('cuisines', JSON.stringify(newUser.cuisines))
+    form_data.append('budget', newUser.budget)
 
     const updateUserProfileResponse = await fetch(`${BACKEND_ENDPOINT}/user/api/update_profile`, {
       method: "POST",
       headers: {
-        "X-CSRFToken": getCookie("csrftoken") || "",
+        'X-CSRFToken': csrftoken || '',
       },
       body: form_data,
       credentials: "include",
@@ -119,11 +120,7 @@ export default function ProfilePage() {
   }
 
   if (user.is_restaurant) {
-    return (
-      <a href="/accounts/logout/" className="logout-button">
-        <span>Logout</span>
-      </a>
-    )
+    return (<LogoutButton/>)
   }
 
   return (
@@ -147,6 +144,7 @@ export default function ProfilePage() {
                   <div className="image-section">
                     <div className={`image-wrapper ${isEditing ? "editable" : ""}`} onClick={handleImageClick}>
                       <Image src={newUser.image === "" ? default_image_url : newUser.image} alt="Profile" fill className="image" />
+
                       {isEditing && (
                         <div className="image-overlay">
                           <Camera className="overlay-icon" size={32} />
@@ -187,8 +185,8 @@ export default function ProfilePage() {
                       </label>
                       <select
                         id="budget"
-                        value={preferredBudget}
-                        onChange={(e) => setPreferredBudget(e.target.value)}
+                        value={newUser.budget}
+                        onChange={(e) => setNewUser({ ...newUser, budget: e.target.value })}
                         className={`budget-select ${isEditing ? "editable-input" : "readonly-input"}`}
                         disabled={!isEditing}
                       >
@@ -227,10 +225,6 @@ export default function ProfilePage() {
                       </div>
                     ))}
                   </div>
-
-                  <a href="/accounts/logout/" className="logout-button">
-                    <span>Logout</span>
-                  </a>
                 </div>
 
                 {isEditing && (
@@ -248,6 +242,7 @@ export default function ProfilePage() {
                   </div>
                 )}
               </form>
+              <LogoutButton />
             </div>
           </div>
         </div>

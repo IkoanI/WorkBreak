@@ -1,7 +1,6 @@
 'use client';
 
 import React, { useState } from 'react';
-import { getCookie } from 'typescript-cookie';
 import { redirect } from "next/navigation";
 import SignupInput from "./SignupInput";
 import "./SignupForm.css";
@@ -21,7 +20,7 @@ export default function SignupForm() {
   const [is_restaurant, setIsRestaurant] = useState(false);
   const [restaurant_name, setRestaurantName] = useState('');
   const [place_id, setPlaceID] = useState('');
-  const { googleMapsLibrary } = useAppContext();
+  const { googleMapsLibrary, csrftoken } = useAppContext();
   const [errors, setErrors] = useState();
 
 
@@ -32,7 +31,7 @@ export default function SignupForm() {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'X-CSRFToken': getCookie('csrftoken') || '',
+        'X-CSRFToken': csrftoken || '',
       },
       body: JSON.stringify({ username, email, password1, password2, is_restaurant, restaurant_name, place_id }),
       credentials: 'include',
@@ -76,7 +75,7 @@ export default function SignupForm() {
       </div>
 
       <h1 className = "signup-title"> Create Your Account </h1>
-      <form onSubmit = {handleSubmit} className = "signup-form">
+      <form onSubmit = {handleSubmit} className = "signup-form" method="POST">
         {errors != undefined && errors["username"] && <p>{errors["username"]}</p>}
         <SignupInput
           label = "Username:"

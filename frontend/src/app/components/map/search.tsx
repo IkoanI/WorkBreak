@@ -57,9 +57,6 @@ export default function Search (data : Props) {
                     const p1 = new Latlon (data.position.lat, data.position.lng);
                     const p2 = new Latlon (place.location?.lat() as number, place.location?.lng() as number);
                     const dist = p1.distanceTo(p2);
-                    console.log(distance);
-                    console.log(dist);
-                    console.log(place.priceLevel);
                     if (distance >= dist) {
                         const marker = (new (googleMapsLibrary.markerLibrary.AdvancedMarkerElement)({
                             map,

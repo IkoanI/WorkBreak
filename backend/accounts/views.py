@@ -1,12 +1,12 @@
-import os
-
-from django.shortcuts import redirect
 from django.contrib.auth import login as auth_login, authenticate, logout as auth_logout
 from django.contrib.auth.decorators import login_required
-from django.http import JsonResponse, HttpResponse
+from django.views.decorators.csrf import ensure_csrf_cookie
+from django.http import JsonResponse
 import json
 from user.models import UserProfile, RestaurantProfile
 from .forms import CustomUserCreationForm
+from django.views.decorators.csrf import get_token
+
 # Create your views here.
 def signup(request):
     if request.method == 'POST':
@@ -44,12 +44,14 @@ def logout(request):
     except:
         return JsonResponse({'error': 'Logout failed!'}, status=400)
 
+@ensure_csrf_cookie
 def check_auth(request):
+    response = {"token":get_token(request),}
     if not request.user.is_authenticated:
-        return JsonResponse({'message': 'User not logged in'}, status=400)
+        return JsonResponse(response, status=400)
 
     user = request.user
-    response = {'username': user.get_username(),}
+    response['username'] = user.get_username()
     if user.is_restaurant:
         restaurant_profile = RestaurantProfile.objects.get(user=user)
         response['is_restaurant'] = True
@@ -58,7 +60,11 @@ def check_auth(request):
     else:
         user_profile = UserProfile.objects.get(user=user)
         response['is_restaurant'] = False
-        response['image'] = user_profile.image.url
+
+        if user_profile.image:
+            response['image'] = user_profile.image.url
+
         response['cuisines'] = user_profile.cuisines
+        response['budget'] = user_profile.budget
 
     return JsonResponse(response, status=200)

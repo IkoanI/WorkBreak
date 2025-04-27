@@ -34,6 +34,7 @@ export default function PlacesSearchTiles({ position, formData }: Props) {
       ? googleMapsLibrary.placesLibrary.PriceLevel[formData.budget as keyof typeof google.maps.places.PriceLevel]
       : google.maps.places.PriceLevel.MODERATE;
 
+
     const request = {
       textQuery: cuisine,
       fields: [
@@ -48,7 +49,8 @@ export default function PlacesSearchTiles({ position, formData }: Props) {
       ],
       locationBias: position,
       priceLevels: [budget],
-      useStrictTypeFiltering: false,
+      useStrictTypeFiltering: true,
+      includedType: "restaurant"
     };
 
     setLoading(true);
@@ -164,14 +166,14 @@ const styles = {
     marginTop: "20px",
   },
   card: {
-    border: "1px solid #ddd",
-    borderRadius: "8px",
-    padding: "10px",
-    backgroundColor: "#fff",
-    boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
-    display: "flex",
-    flexDirection: "column",
-    alignItems: "center",
+    border: '1px solid #ddd',
+    borderRadius: '8px',
+    padding: '10px',
+    backgroundColor: '#fff',
+    boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+    display: 'flex',
+    flexDirection: 'column' as const,
+    alignItems: 'center',
   },
   image: {
     width: "100%",

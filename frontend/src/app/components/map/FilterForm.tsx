@@ -27,7 +27,7 @@ export default function FilterForm({ destination }: Props) {
     searchQuery: "",
     cuisine: user.cuisines.length > 0 ? user.cuisines[0] : "",
     distance: "1",
-    budget: "MODERATE",
+    budget: user.budget,
   });
 
   const [isSearching, setIsSearching] = useState(false);
@@ -64,6 +64,7 @@ export default function FilterForm({ destination }: Props) {
               value={formData.cuisine}
               onChange={(e) => setFormData({ ...formData, cuisine: e.target.value })}
             >
+
               <option value="">Select Cuisine</option>
               {cuisineOptions.map((cuisine) => (
                 <option key={cuisine} value={cuisine.toLowerCase()}>
@@ -96,7 +97,6 @@ export default function FilterForm({ destination }: Props) {
               value={formData.budget}
               onChange={(e) => setFormData({ ...formData, budget: e.target.value })}
             >
-              <option value="">Select Budget</option>
               <option value={googleMapsLibrary.priceLevel.INEXPENSIVE}>Inexpensive</option>
               <option value={googleMapsLibrary.priceLevel.MODERATE}>Moderate</option>
               <option value={googleMapsLibrary.priceLevel.EXPENSIVE}>Expensive</option>

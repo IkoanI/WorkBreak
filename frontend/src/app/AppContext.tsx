@@ -24,14 +24,16 @@ export type User = {
     cuisines: string[];
     is_restaurant: boolean;
     restaurant_name: string;
+    budget: string;
 }
 
-export const defaultUser = {
+export const defaultUser: User = {
     username : "",
     image : "",
     cuisines : new Array<string>(),
     is_restaurant: false,
     restaurant_name: "",
+    budget: "INEXPENSIVE",
 }
 
 type AppContextType = {
@@ -40,6 +42,7 @@ type AppContextType = {
     isAuthenticated: boolean;
     setIsAuthenticated:(isAuthenticated: boolean) => void;
     googleMapsLibrary: GoogleMapsLibrary | null;
+    csrftoken: string;
 };
 
 type ContextProviderProps = {
@@ -52,7 +55,8 @@ export const AppContext = createContext<AppContextType>(
         setUser: () => {},
         isAuthenticated:false,
         setIsAuthenticated: () => {},
-        googleMapsLibrary:null
+        googleMapsLibrary:null,
+        csrftoken:''
     }
 )
 
@@ -62,14 +66,21 @@ export const ContextProvider = ({ children }: ContextProviderProps) => {
   const [user, setUser] = useState(defaultUser);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [googleMapsLibrary, setGoogleMapsLibrary] = useState<GoogleMapsLibrary | null>(null);
-
+  const [csrftoken, setCsrftoken] = useState('');
   useEffect(() => {
       async function check_auth() {
-          const response = await fetch(BACKEND_ENDPOINT + "/accounts/api/check_auth");
-          const data = await response.json();
-          if (response.ok) {
-            setUser({...defaultUser, ...data, image: BACKEND_ENDPOINT + data.image});
+          const response = await fetch(`${BACKEND_ENDPOINT}/accounts/api/check_auth`,{
+              credentials: 'include',
+          });
 
+          const data = await response.json();
+          setCsrftoken(data.token);
+          if (response.ok) {
+            if (data.image) {
+                data.image = `${BACKEND_ENDPOINT}/${data.image}`
+            }
+            setUser({...defaultUser, ...data,});
+            console.log(user)
             if (!isAuthenticated) {
                 setIsAuthenticated(true);
             }
@@ -93,13 +104,13 @@ export const ContextProvider = ({ children }: ContextProviderProps) => {
                 const priceLevel = google.maps.places.PriceLevel;
                 setGoogleMapsLibrary({placesLibrary, markerLibrary, mapsLibrary, priceLevel});
             }
-        }
+      }
 
-        on_mount();
-    }, [googleMapsLibrary]);
+      on_mount();
+  }, [googleMapsLibrary]);
   
   return (
-      <AppContext.Provider value={{user, setUser, isAuthenticated, setIsAuthenticated, googleMapsLibrary}}>
+      <AppContext.Provider value={{user, setUser, isAuthenticated, setIsAuthenticated, googleMapsLibrary, csrftoken}}>
           {children}
       </AppContext.Provider>
   );

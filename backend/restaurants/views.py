@@ -1,8 +1,15 @@
 import json
+import os
+
+import requests
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404
+from rest_framework import status
+from rest_framework.decorators import api_view
+
 from restaurants.models import Restaurant, UserReview
+from dotenv import load_dotenv, dotenv_values
 
 def get_restaurant(request, slug):
     restaurant = get_object_or_404(Restaurant, slug=slug)
@@ -29,6 +36,7 @@ def get_reviews(request, slug):
 def create_review(request, slug):
     if request.method == 'POST':
         data = json.loads(request.body)
+
         restaurant, _ = Restaurant.objects.get_or_create(
             slug=slug,
             defaults={"name": slug.replace("-", " ").title(), "description": "Auto-generated restaurant."}
@@ -48,4 +56,40 @@ def create_review(request, slug):
             "created_at": user_review.created_at
         }, status=200)
 
-    return JsonResponse({'error': 'Invalid request method.'}, status=405)
+    return JsonResponse({'error': 'Invalid request method'}, status=status.HTTP_405_METHOD_NOT_ALLOWED)
+
+@api_view(['GET'])
+def tripadvisor_search(request, name, lat, lng):
+    # Load the TripAdvisor API key from environment
+    api_key = dotenv_values(".env.local")['TRIPADVISOR_API_KEY']
+    if not api_key:
+        return JsonResponse({"error": "TripAdvisor API key not configured"}, status=500)
+
+    # TripAdvisor API endpoint
+    url = 'https://api.content.tripadvisor.com/api/v1/location/search'
+    params = {'key': api_key, 'searchQuery': name, 'latLong': f'{lat},{lng}', 'category' : 'restaurant'}
+    headers = {"accept": "application/json"}
+
+    try:
+        response = requests.get(url, params=params, headers=headers)
+        response.raise_for_status()
+        return JsonResponse(response.json(), status=200)
+    except requests.RequestException as e:
+        return JsonResponse({"error": str(e)}, status=401)
+
+def tripadvisor_reviews(request, location_id):
+    api_key = dotenv_values(".env.local")['TRIPADVISOR_API_KEY']
+    if not api_key:
+        return JsonResponse({"error": "TripAdvisor API key not configured"}, status=500)
+
+    # TripAdvisor API endpoint
+    url = f'https://api.content.tripadvisor.com/api/v1/location/{location_id}/reviews'
+    params = {'key': api_key,}
+    headers = {"accept": "application/json"}
+
+    try:
+        response = requests.get(url, params=params, headers=headers)
+        response.raise_for_status()
+        return JsonResponse(response.json(), status=200)
+    except requests.RequestException as e:
+        return JsonResponse({"error": str(e)}, status=401)

@@ -16,6 +16,7 @@ class UserProfile(models.Model):
     user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     image = models.ImageField(default="workbreak.png", upload_to=get_upload_path, blank=True)
     cuisines = models.JSONField(default=list, blank=True)
+    budget = models.CharField(max_length=255, blank=False, default="INEXPENSIVE")
 
     def __str__(self):
         return self.user.username + " Profile"
