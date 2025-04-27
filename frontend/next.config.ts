@@ -1,7 +1,31 @@
-import type { NextConfig } from "next";
+module.exports = {
+  async redirects() {
+    return [
+      {
+        source: '/',
+        destination: '/home',
+        permanent: true,
+      },
+    ]
+  },
 
-const nextConfig: NextConfig = {
-  /* config options here */
-};
+    images: {
+        remotePatterns: [
+            {
+                protocol: 'http',
+                hostname: '127.0.0.1',
+                port: '8000',
+            },
 
-export default nextConfig;
+            {
+                protocol: 'https',
+                hostname: 'workbreak.pythonanywhere.com',
+            },
+
+            {
+                protocol: 'http',
+                hostname: 'places.googleapis.com',
+            },
+        ],
+    },
+}

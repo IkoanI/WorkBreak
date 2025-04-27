@@ -23,7 +23,7 @@ export default function TopSection() {
           <Link href = "/about" className = "btn-outline">
             Learn More
           </Link>
-          <Link href = "/accounts/signup" className = "btn-primary">
+          <Link href = "/restaurants/discover" className = "btn-primary">
             Find a Spot
           </Link>
         </div>

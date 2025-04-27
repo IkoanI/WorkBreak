@@ -11,6 +11,9 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 
 from pathlib import Path
+import os
+from dotenv import load_dotenv
+load_dotenv()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -25,8 +28,7 @@ SECRET_KEY = 'django-insecure-_+*dvh_yn(98jl8-2frj_9eca)0sd@!)atp3ydhti2+dw#!jo3
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
-
+ALLOWED_HOSTS = ['*']
 
 # Application definition
 
@@ -42,7 +44,10 @@ INSTALLED_APPS = [
     'corsheaders',
     'workbreak',
     'accounts',
-    'home'
+    'home',
+    'user',
+    'restaurants',
+    'django_cleanup.apps.CleanupConfig',
 ]
 
 MIDDLEWARE = [
@@ -106,6 +111,13 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+AUTH_USER_MODEL = "accounts.WorkBreakUser"
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.SessionAuthentication',
+    ]
+}
 
 # Internationalization
 # https://docs.djangoproject.com/en/5.1/topics/i18n/
@@ -123,6 +135,10 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
 
 STATIC_URL = 'static/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+MEDIA_URL = 'media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
@@ -130,10 +146,53 @@ STATIC_URL = 'static/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 CORS_ALLOWED_ORIGINS = [
-    # add server hosting frontend server in prod
+    "http://localhost:8000",
     "http://localhost:3000",
+    "https://localhost:8000",
+    "https://localhost:3000",
+    "http://127.0.0.1:3000",
+    "http://127.0.0.1:8000",
+    "https://127.0.0.1:3000",
+    "https://127.0.0.1:8000",
+    "https://work-break.vercel.app",
+    "https://workbreak.pythonanywhere.com"
 ]
+
+SECURE_REFERRER_POLICY = "strict-origin-when-cross-origin"
+CORS_ALLOW_ALL_ORIGINS = True
+
+SESSION_COOKIE_SECURE = True
+CSRF_COOKIE_SECURE = True
+SESSION_COOKIE_SAMESITE = "None"
+CSRF_COOKIE_SAMESITE = "None"
+CORS_ALLOW_CREDENTIALS = True
+
+CSRF_TRUSTED_ORIGINS = [
+    "http://localhost:8000",
+    "http://localhost:3000",
+    "https://localhost:8000",
+    "https://localhost:3000",
+    "http://127.0.0.1:3000",
+    "http://127.0.0.1:8000",
+    "https://127.0.0.1:3000",
+    "https://127.0.0.1:8000",
+    "https://work-break.vercel.app",
+    "https://workbreak.pythonanywhere.com"
+]
+
+NEXTJS_DEV_MODE = True
+NEXTJS_DEV_CMD  = "npm run dev"
+NEXTJS_DEV_ADDR = "http://localhost:3000"
+
+NEXTJS_SETTINGS = {
+    "nextjs_server_url": "https://work-break.vercel.app",
+}
 
 APPEND_SLASH = False
 
-LOGIN_URL = "/accounts/login"
+EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+EMAIL_HOST = "smtp.gmail.com"
+EMAIL_USE_TLS = True
+EMAIL_PORT = 587
+EMAIL_HOST_USER = "cs2340group3@gmail.com"
+EMAIL_HOST_PASSWORD = os.getenv("CS2340_Gmail_App_Password")
