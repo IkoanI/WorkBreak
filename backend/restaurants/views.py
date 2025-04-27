@@ -1,5 +1,4 @@
 import json
-import os
 
 import requests
 from django.contrib.auth.decorators import login_required
@@ -8,8 +7,12 @@ from django.shortcuts import get_object_or_404
 from rest_framework import status
 from rest_framework.decorators import api_view
 
+from accounts.models import WorkBreakUser
 from restaurants.models import Restaurant, UserReview
 from dotenv import load_dotenv, dotenv_values
+
+from user.models import RestaurantProfile
+
 
 def get_restaurant(request, slug):
     restaurant = get_object_or_404(Restaurant, slug=slug)
@@ -19,16 +22,27 @@ def get_restaurant(request, slug):
         'slug': restaurant.slug
     })
 
-def get_reviews(request, slug):
+def get_reviews(request, slug, place_id):
     restaurant = get_object_or_404(Restaurant, slug=slug)
     user_reviews = UserReview.objects.filter(restaurant_name=restaurant.name).order_by('-created_at')
 
-    reviews_data = [{
-        "user": review.user.username,
-        "rating": review.rating,
-        "comment": review.comment,
-        "created_at": review.created_at
-    } for review in user_reviews]
+    reviews_data = []
+
+    for review in user_reviews:
+        user = WorkBreakUser.objects.get(username=review.user.username)
+        review_data = {
+            "user": review.user.username,
+            "rating": review.rating,
+            "comment": review.comment,
+            "created_at": review.created_at
+        }
+        if user.is_restaurant:
+            restaurant_profile = RestaurantProfile.objects.get(user=user)
+            if restaurant_profile.place_id == place_id:
+                review_data["user"] += " (Owner)"
+
+        reviews_data.append(review_data)
+
 
     return JsonResponse({"reviews": reviews_data}, status=200)
 

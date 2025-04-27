@@ -11,5 +11,5 @@ urlpatterns = [
     path("api/tripadvisor_reviews/<str:location_id>", tripadvisor_reviews, name="restaurants.api.tripadvisor_reviews"),
     path("api/<slug:slug>/", get_restaurant, name="restaurants.api.get_restaurant"),
     path("api/<slug:slug>/create_review/", create_review, name="restaurants.api.create_review"),
-    path("api/<slug:slug>/reviews/", get_reviews, name="restaurants.api.get_reviews"),
+    path("api/<slug:slug>/<str:place_id>/reviews/", get_reviews, name="restaurants.api.get_reviews"),
 ]

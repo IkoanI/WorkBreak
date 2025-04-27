@@ -83,11 +83,11 @@ export default function RestaurantPage() {
     if (!placeDetails?.name) return;
     const slug = createSlug(placeDetails.name);
 
-    fetch(`${BACKEND_ENDPOINT}/restaurants/api/${slug}/reviews/`, { credentials: "include" })
+    fetch(`${BACKEND_ENDPOINT}/restaurants/api/${slug}/${placeId}/reviews/`, { credentials: "include" })
       .then(res => res.ok ? res.json() : Promise.reject())
       .then(data => setUserReviews(data.reviews || []))
       .catch(() => console.error("Failed to load user reviews"));
-  }, [placeDetails?.name]);
+  }, [placeDetails?.name, placeId]);
 
   useEffect(() => {
     if (!placeDetails?.opening_hours?.weekday_text) return;
