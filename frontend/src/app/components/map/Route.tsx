@@ -3,7 +3,6 @@ import {useAppContext} from "@/app/AppContext";
 
 type Props = {
     placeId : string;
-    destination : {lat: number, lng: number};
 }
 
 const containerStyle = {
