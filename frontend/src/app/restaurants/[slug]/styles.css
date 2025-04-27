@@ -1,0 +1,126 @@
+.restaurant-page-wrapper {
+  max-width: 1200px;
+  margin: 2rem auto;
+  padding: 1rem;
+}
+
+.restaurant-header {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2rem;
+  margin-bottom: 2rem;
+}
+
+.restaurant-info {
+  flex: 1;
+}
+
+.restaurant-photo {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.restaurant-photo img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 12px;
+  object-fit: cover;
+}
+
+.restaurant-hours ul {
+  padding-left: 1rem;
+  list-style: disc;
+}
+
+.restaurant-reviews-section {
+  margin-top: 2rem;
+}
+
+.google-reviews-scroll {
+  max-height: 300px;
+  overflow-y: scroll;
+  border: 1px solid #ddd;
+  padding: 1rem;
+  border-radius: 8px;
+  background-color: #fafafa;
+}
+
+.google-review-card {
+  font-size: 0.85rem;
+  margin-bottom: 1rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid #eee;
+}
+
+.user-reviews-section {
+  margin-top: 3rem;
+}
+
+.review-form {
+  margin-bottom: 2rem;
+}
+
+.form-group {
+  margin-bottom: 1rem;
+}
+
+.star-rating {
+  font-size: 1.5rem;
+  cursor: pointer;
+}
+
+.star {
+  color: #ccc;
+  transition: color 0.3s;
+}
+
+.star.filled {
+  color: #f5b50a;
+}
+
+.form-textarea {
+  width: 100%;
+  min-height: 100px;
+  padding: 0.5rem;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+}
+
+.submit-review-button {
+  background-color: #4caf50;
+  color: white;
+  padding: 0.6rem 1.2rem;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.submit-review-button:hover {
+  background-color: #45a049;
+}
+
+.user-reviews-list {
+  margin-top: 2rem;
+}
+
+.user-review-card {
+  background: #f9f9f9;
+  padding: 1rem;
+  margin-bottom: 1rem;
+  border-radius: 8px;
+}
+
+.open-status {
+  font-weight: bold;
+  margin-top: 10px;
+}
+
+.open-status.open {
+  color: green;
+}
+
+.open-status.closed {
+  color: red;
+}

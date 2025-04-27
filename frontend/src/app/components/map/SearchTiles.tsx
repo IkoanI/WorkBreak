@@ -1,81 +1,92 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import Latlon from "geodesy/latlon-ellipsoidal-vincenty";
+import Latlon from 'geodesy/latlon-ellipsoidal-vincenty';
 import "../../globals.css";
-import Place = google.maps.places.Place;
 import { useAppContext } from "@/app/AppContext";
-import { useRouter } from "next/navigation"; 
 
 type Props = {
   position: { lat: number; lng: number };
-  formData: { cuisine: string; distance: string; budget: string };
+  formData: {
+    searchQuery: string;
+    cuisine: string;
+    distance: string;
+    budget: string;
+  };
 };
 
-function PlacesSearchTiles(data: Props) {
+import Place = google.maps.places.Place;
+
+export default function PlacesSearchTiles({ position, formData }: Props) {
   const [results, setResults] = useState<Place[]>([]);
   const [loading, setLoading] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+
   const { googleMapsLibrary } = useAppContext();
-  const router = useRouter(); 
 
   useEffect(() => {
     if (!googleMapsLibrary) return;
 
-    const cuisine = data.formData.cuisine ? `${data.formData.cuisine} food` : "food";
-
-    const budget =
-      data.formData.budget == null
-        ? google.maps.places.PriceLevel.MODERATE
-        : googleMapsLibrary.placesLibrary.PriceLevel[
-            data.formData.budget as keyof typeof google.maps.places.PriceLevel
-          ];
-
-
-    const distance = Number(data.formData.distance) * 1609.344;
+    const distanceMeters = Number(formData.distance) * 1609.344;
+    const cuisine = formData.cuisine ? `${formData.cuisine} food` : "food";
+    const budget = formData.budget
+      ? googleMapsLibrary.placesLibrary.PriceLevel[formData.budget as keyof typeof google.maps.places.PriceLevel]
+      : google.maps.places.PriceLevel.MODERATE;
 
 
     const request = {
       textQuery: cuisine,
       fields: [
-        "displayName",
-        "id",
-        "location",
-        "formattedAddress",
-        "priceLevel",
-        "rating",
-        "editorialSummary",
-        "photos",
+        'displayName', 
+        'id', 
+        'location', 
+        'formattedAddress', 
+        'priceLevel', 
+        'rating', 
+        'editorialSummary', 
+        'photos'
       ],
-      locationBias: data.position,
+      locationBias: position,
       priceLevels: [budget],
       useStrictTypeFiltering: true,
       includedType: "restaurant"
     };
 
-    if (!googleMapsLibrary || !window.google?.maps?.places?.Place || !request) return;
-
     setLoading(true);
 
     googleMapsLibrary.placesLibrary.Place.searchByText(request)
       .then((response) => {
-        response.places.map((place: Place) => {
-          const p1 = new Latlon(data.position.lat, data.position.lng);
-          const p2 = new Latlon(place.location?.lat() as number, place.location?.lng() as number);
+        const filtered = (response.places || []).filter((place: Place) => {
+          if (!place.location) return false;
+          const p1 = new Latlon(position.lat, position.lng);
+          const p2 = new Latlon(place.location.lat() as number, place.location.lng() as number);
           const dist = p1.distanceTo(p2);
-          if (distance >= dist) {
-            return place;
-          }
-        });
-        setResults(response.places || []);
-      })
-      .catch((err) => {
-        console.error("Places search failed:", err);
-      })
-      .finally(() => setLoading(false));
-  }, [data, googleMapsLibrary]);
 
-   const createSlug = (name: string) => {
-    return name.toLowerCase().replace(/[^\w\s-]/g, "").replace(/\s+/g, "-").replace(/--+/g, "-");
+          const nameMatch = formData.searchQuery
+            ? place.displayName?.toLowerCase().includes(formData.searchQuery.toLowerCase())
+            : true;
+
+          return dist <= distanceMeters && nameMatch;
+        });
+        setResults(filtered);
+      })
+      .catch((err) => console.error('Places search failed:', err))
+      .finally(() => setLoading(false));
+  }, [position, formData, googleMapsLibrary]);
+
+  const resultsPerPage = 8;
+  const indexOfLast = currentPage * resultsPerPage;
+  const indexOfFirst = indexOfLast - resultsPerPage;
+  const currentResults = results.slice(indexOfFirst, indexOfLast);
+
+  const totalPages = Math.ceil(results.length / resultsPerPage);
+
+  const handleNextPage = () => {
+    if (currentPage < totalPages) setCurrentPage((prev) => prev + 1);
+  };
+
+  const handlePrevPage = () => {
+    if (currentPage > 1) setCurrentPage((prev) => prev - 1);
   };
 
   return (
@@ -83,36 +94,46 @@ function PlacesSearchTiles(data: Props) {
       {loading ? (
         <p>Loading...</p>
       ) : (
-        <div style={styles.grid}>
-          {results.map((place: Place) => (
-            <div key={place.id} style={styles.card}>
-              {place.photos?.[0]?.getURI ? (
-                <img
-                  width={220}
-                  height={140}
-                  src={place.photos[0].getURI()}
-                  alt={place.displayName || "Place Image"}
-                  style={styles.image}
-                />
-              ) : (
-                <div style={styles.noImage}>No Image</div>
-              )}
-              <h3>{place.displayName}</h3>
-              <p>{place.formattedAddress}</p>
-              <p style={{ fontSize: "0.85rem", color: "#666" }}>{place.businessStatus}</p>
+        <>
+          <div style={styles.grid}>
+            {currentResults.map((place) => (
+              <div key={place.id} style={styles.card}>
+                {place.photos?.[0]?.getURI() ? (
+                  <img
+                    src={place.photos[0].getURI()}
+                    alt={place.displayName || "Place Image"}
+                    style={styles.image}
+                  />
+                ) : (
+                  <div style={styles.noImage}>No Image</div>
+                )}
+                <h3>{place.displayName}</h3>
+                <p>{place.formattedAddress}</p>
+                <p style={{ fontSize: "0.85rem", color: "#666" }}>{place.businessStatus}</p>
+              </div>
+            ))}
+          </div>
 
-               <button
-                onClick={() => {
-                  const slug = createSlug(place.displayName || "restaurant");
-                  router.push(`/restaurants/${slug}?id=${place.id}`);
-                }}
-                style={styles.viewMoreButton}
+          {results.length > resultsPerPage && (
+            <div style={styles.pagination}>
+              <button
+                onClick={handlePrevPage}
+                disabled={currentPage === 1}
+                style={styles.pageButton}
               >
-                View More
+                Previous
+              </button>
+              <span>Page {currentPage} of {totalPages}</span>
+              <button
+                onClick={handleNextPage}
+                disabled={currentPage === totalPages}
+                style={styles.pageButton}
+              >
+                Next
               </button>
             </div>
-          ))}
-        </div>
+          )}
+        </>
       )}
     </div>
   );
@@ -120,50 +141,51 @@ function PlacesSearchTiles(data: Props) {
 
 const styles = {
   grid: {
-    display: "grid",
-    gridTemplateColumns: "repeat(auto-fill, minmax(220px, 1fr))",
-    gap: "1rem",
-    marginTop: "20px",
+    display: 'grid',
+    gridTemplateColumns: 'repeat(4, 1fr)',
+    gap: '1rem',
+    marginTop: '20px',
   },
   card: {
-    border: "1px solid #ddd",
-    borderRadius: "8px",
-    padding: "10px",
-    backgroundColor: "#fff",
-    boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
-    position: "relative" as const,
-    height: "400px",
+    border: '1px solid #ddd',
+    borderRadius: '8px',
+    padding: '10px',
+    backgroundColor: '#fff',
+    boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+    display: 'flex',
+    flexDirection: 'column' as const,
+    alignItems: 'center',
   },
   image: {
-    width: "100%",
-    height: "140px",
-    objectFit: "cover" as const,
-    borderRadius: "4px",
-    marginBottom: "10px",
+    width: '100%',
+    height: '140px',
+    objectFit: 'cover' as const,
+    borderRadius: '4px',
+    marginBottom: '10px',
   },
   noImage: {
-    width: "100%",
-    height: "140px",
-    backgroundColor: "#f0f0f0",
-    borderRadius: "4px",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    color: "#888",
-    marginBottom: "10px",
+    width: '100%',
+    height: '140px',
+    backgroundColor: '#f0f0f0',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    color: '#888',
+    marginBottom: '10px',
+    borderRadius: '4px',
   },
-  viewMoreButton: {
-    backgroundColor: "#047857",
-    color: "white",
-    padding: "8px 16px",
-    borderRadius: "9999px",
-    border: "none",
-    position: "absolute" as const,
-    bottom: "10px",
-    right: "10px",
-    cursor: "pointer",
-    fontWeight: "bold",
+  pagination: {
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: '20px',
+    gap: '1rem',
+  },
+  pageButton: {
+    padding: '8px 16px',
+    border: '1px solid #ccc',
+    borderRadius: '6px',
+    backgroundColor: '#f9f9f9',
+    cursor: 'pointer',
   },
 };
-
-export default PlacesSearchTiles;
