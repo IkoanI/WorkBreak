@@ -41,7 +41,8 @@ function PlacesSearchTiles ( data : Props ) {
                 'priceLevel', 'rating', 'editorialSummary', 'photos'],
             locationBias: data.position,
             priceLevels: [budget],
-            useStrictTypeFiltering: false,
+            includedType: "restaurant",
+            useStrictTypeFiltering: true,
         }
     
         if (!googleMapsLibrary || !window.google?.maps?.places?.Place || !request) return;

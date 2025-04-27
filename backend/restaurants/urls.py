@@ -1,9 +1,11 @@
 from django.urls import path
 from django_nextjs.views import nextjs_page
-from .views import get_restaurant, create_review
+from .views import get_restaurant, create_review, tripadvisor_search
+
 urlpatterns = [
     path("<slug:slug>", nextjs_page(), name="restaurants.page"),
     path("discover", nextjs_page(), name="restaurants.discover"),
+    path("api/tripadvisor_search/<str:name>/<str:lat>/<str:lng>", tripadvisor_search, name="restaurants.api.tripadvisor_search"),
     path("api/<slug:slug>/", get_restaurant, name="restaurants.api.get_restaurant"),
     path("api/<slug:slug>/create_review/", create_review, name="restaurants.api.create_review"),
 ]

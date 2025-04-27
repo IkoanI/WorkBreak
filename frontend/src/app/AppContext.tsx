@@ -104,7 +104,7 @@ export const ContextProvider = ({ children }: ContextProviderProps) => {
       }
 
       on_mount();
-    }, [googleMapsLibrary]);
+  }, [googleMapsLibrary]);
   
   return (
       <AppContext.Provider value={{user, setUser, isAuthenticated, setIsAuthenticated, googleMapsLibrary, csrftoken}}>

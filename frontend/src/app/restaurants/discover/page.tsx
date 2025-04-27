@@ -3,6 +3,7 @@
 import React, {useEffect, useState} from "react";
 import FilterForm from '@/app/components/map/FilterForm';
 import {useAppContext} from "@/app/AppContext";
+import TripadvisorReviews from "@/app/components/tripadvisor/TripadvisorReviews";
 
 export default function DiscoverPage() {
     const {googleMapsLibrary} = useAppContext();
@@ -34,6 +35,7 @@ export default function DiscoverPage() {
     return (
         <div>
             <div>
+                <TripadvisorReviews restaurant_name={"Papa Johns Pizza"} coords={{lat: 33.781551, lng: -84.399268}}/>
                 {googleMapsLibrary && <FilterForm destination={coords}/>}
             </div>
         </div>
