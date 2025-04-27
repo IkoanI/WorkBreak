@@ -1,7 +1,8 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import Latlon from 'geodesy/latlon-ellipsoidal-vincenty';
+import Latlon from "geodesy/latlon-ellipsoidal-vincenty";
+import Link from "next/link";  
 import "../../globals.css";
 import { useAppContext } from "@/app/AppContext";
 
@@ -89,6 +90,15 @@ export default function PlacesSearchTiles({ position, formData }: Props) {
     if (currentPage > 1) setCurrentPage((prev) => prev - 1);
   };
 
+  const createSlug = (name: string) =>
+    name
+      .trim()
+      .toLowerCase()
+      .replace(/[^\w\s-]/g, "")
+      .replace(/\s+/g, "-")
+      .replace(/--+/g, "-")
+      .replace(/-$/, "");
+
   return (
     <div style={{ padding: "20px" }}>
       {loading ? (
@@ -110,6 +120,15 @@ export default function PlacesSearchTiles({ position, formData }: Props) {
                 <h3>{place.displayName}</h3>
                 <p>{place.formattedAddress}</p>
                 <p style={{ fontSize: "0.85rem", color: "#666" }}>{place.businessStatus}</p>
+
+                <div style={styles.buttonWrapper}>
+                  <Link
+                    href={`/restaurants/${createSlug(place.displayName || "restaurant")}?id=${place.id}`}
+                    style={styles.viewMoreButton}
+                  >
+                    View More
+                  </Link>
+                </div>
               </div>
             ))}
           </div>
@@ -141,10 +160,10 @@ export default function PlacesSearchTiles({ position, formData }: Props) {
 
 const styles = {
   grid: {
-    display: 'grid',
-    gridTemplateColumns: 'repeat(4, 1fr)',
-    gap: '1rem',
-    marginTop: '20px',
+    display: "grid",
+    gridTemplateColumns: "repeat(4, 1fr)",  
+    gap: "1rem",
+    marginTop: "20px",
   },
   card: {
     border: '1px solid #ddd',
@@ -157,35 +176,49 @@ const styles = {
     alignItems: 'center',
   },
   image: {
-    width: '100%',
-    height: '140px',
-    objectFit: 'cover' as const,
-    borderRadius: '4px',
-    marginBottom: '10px',
+    width: "100%",
+    height: "140px",
+    objectFit: "cover" as const,
+    borderRadius: "4px",
+    marginBottom: "10px",
   },
   noImage: {
-    width: '100%',
-    height: '140px',
-    backgroundColor: '#f0f0f0',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    color: '#888',
-    marginBottom: '10px',
-    borderRadius: '4px',
+    width: "100%",
+    height: "140px",
+    backgroundColor: "#f0f0f0",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    color: "#888",
+    marginBottom: "10px",
+    borderRadius: "4px",
+  },
+  buttonWrapper: {
+    marginTop: "10px",
+  },
+  viewMoreButton: {
+    display: "inline-block",
+    padding: "6px 12px",
+    backgroundColor: "#047857",
+    color: "white",
+    borderRadius: "9999px",
+    fontSize: "0.85rem",
+    textDecoration: "none",
+    textAlign: "center" as const,
+    marginTop: "8px",
   },
   pagination: {
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginTop: '20px',
-    gap: '1rem',
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+    marginTop: "20px",
+    gap: "1rem",
   },
   pageButton: {
-    padding: '8px 16px',
-    border: '1px solid #ccc',
-    borderRadius: '6px',
-    backgroundColor: '#f9f9f9',
-    cursor: 'pointer',
+    padding: "8px 16px",
+    border: "1px solid #ccc",
+    borderRadius: "6px",
+    backgroundColor: "#f9f9f9",
+    cursor: "pointer",
   },
 };

@@ -28,7 +28,6 @@ const budgetOptions = [
 export default function ProfilePage() {
   const { user, setUser } = useAppContext()
   const [newUser, setNewUser] = useState<User>(user)
-  const [preferredBudget, setPreferredBudget] = useState<string>("MODERATE") // Local state
   const [isEditing, setIsEditing] = useState(false)
   const [isSaving, setIsSaving] = useState(false)
   const [saveSuccess, setSaveSuccess] = useState(false)
@@ -87,7 +86,7 @@ export default function ProfilePage() {
     }
 
     form_data.append('cuisines', JSON.stringify(newUser.cuisines))
-    form_data.append('budget', JSON.stringify(newUser.budget))
+    form_data.append('budget', newUser.budget)
 
     const updateUserProfileResponse = await fetch(`${BACKEND_ENDPOINT}/user/api/update_profile`, {
       method: "POST",
@@ -186,8 +185,8 @@ export default function ProfilePage() {
                       </label>
                       <select
                         id="budget"
-                        value={preferredBudget}
-                        onChange={(e) => setPreferredBudget(e.target.value)}
+                        value={newUser.budget}
+                        onChange={(e) => setNewUser({ ...newUser, budget: e.target.value })}
                         className={`budget-select ${isEditing ? "editable-input" : "readonly-input"}`}
                         disabled={!isEditing}
                       >
