@@ -1,129 +1,113 @@
 'use client';
-import React from "react";
+import React, { useEffect, useState } from "react";
+import { useParams, useSearchParams } from 'next/navigation';
 import "./styles.css";
 
-import { useParams } from 'next/navigation';
-import { useState, useEffect, FormEvent } from 'react';
-import { getCookie } from 'typescript-cookie';
-import { BACKEND_ENDPOINT } from "@/app/AppContext";
-
-interface Restaurant {
-  name: string;
-  description: string;
-}
-
-interface UserReviews {
-  user: string;
-  restaurant_name: string;
-  rating: number;
-  comment: string;
-  created_at: string;
+interface PlaceDetails {
+  formatted_address?: string;
+  rating?: number;
+  price_level?: number;
+  reviews?: {
+    author_name: string;
+    text: string;
+    rating: number;
+  }[];
+  photos?: google.maps.places.PlacePhoto[];
+  opening_hours?: {
+    weekday_text?: string[];
+  };
+  website?: string;
+  name?: string;
 }
 
 export default function RestaurantPage() {
-  const { slug } = useParams();
-  const [restaurant, setRestaurant] = useState<Restaurant | null>(null);
+  const { slug } = useParams();  
+  const searchParams = useSearchParams();
+  const placeId = searchParams.get("id");
+
+  const [placeDetails, setPlaceDetails] = useState<PlaceDetails | null>(null);
   const [error, setError] = useState(false);
-  const [reviews, setReviews] = useState<UserReviews[]>([]);
-  const [rating, setRating] = useState(5);
-  const [comment, setComment] = useState('');
 
-  // restaurant
   useEffect(() => {
-    
-    if (!slug) return;
-    fetch(`${BACKEND_ENDPOINT}/restaurants/api/${slug}/`, {
-      credentials: 'include',
-    })
-      .then(res => {
-        if (!res.ok) throw new Error('Not found');
-        return res.json();
-      })
-      .then(data => setRestaurant(data))
-      .catch(() => setError(true));
-  }, [slug]);
+    if (!placeId || typeof window === "undefined" || !google?.maps) return;
 
-  // get reviews
-  useEffect(() => {
-    if (!slug) return;
-    fetch (`${BACKEND_ENDPOINT}/restaurants/api/${slug}/`, {
-      credentials: 'include',
-    })
-      .then(restaurant => restaurant.json())
-      .then(setReviews);
-    } , [slug]);
-
-    // write review
-    const handleSubmit = async (e: FormEvent) => {
-      e.preventDefault();
-
-      //cant fetch review to post, need help
-      //in workbreak/setting.py changed 3000 port to 8000 to check if it works, allowed page to render in 8000 port
-      //but still correctly fetching user review from backend
-
-      const res = await fetch(`${BACKEND_ENDPOINT}/restaurants/api/${slug}/create_review/`, {
-        method: 'POST',
-        credentials: 'include',
-        headers: {
-          'Content-Type': 'application/json',
-          'X-CSRFToken': getCookie('csrftoken') || ''
-        },
-        body: JSON.stringify({ rating, comment }),
+    const fetchPlaceDetails = () => {
+      const service = new google.maps.places.PlacesService(document.createElement("div"));
+      service.getDetails({ placeId }, (place, status) => {
+        if (status === google.maps.places.PlacesServiceStatus.OK && place) {
+          setPlaceDetails({
+            formatted_address: place.formatted_address || "",
+            rating: place.rating ?? 0,
+            price_level: place.price_level ?? 0,
+            reviews: place.reviews?.map((r) => ({
+              author_name: r.author_name,
+              text: r.text,
+              rating: r.rating ?? 0
+            })) || [],
+            photos: place.photos || [],
+            opening_hours: {
+              weekday_text: place.opening_hours?.weekday_text || []
+            },
+            website: place.website || "",
+            name: place.name || ""
+          });
+        } else {
+          setError(true);
+        }
       });
-      if (res.ok) {
-        const newReview = await res.json();
-        setReviews((prevReviews) => [newReview, ...prevReviews]);
-        setRating(5);
-        setComment('');
-      } else {
-        alert('Failed to post review');
-      }
     };
-    if (error) return <div>Failed to load.</div>;
-    if (!restaurant) return <div>Loading…</div>;
 
+    fetchPlaceDetails();
+  }, [placeId]);
+
+  if (error) return <div>Failed to load.</div>;
+  if (!placeDetails) return <div>Loading…</div>;
 
   return (
-    <div>
-      <h1>{restaurant.name}</h1>
-      <p>{restaurant.description}</p>
-      <section>
-        <h2>Leave a Review</h2>
+    <div className="restaurant-details-page">
+      <h1 className="restaurant-title">{placeDetails.name}</h1>
 
-        <div>
-          {reviews.map(review => (
-            <div key={review.user}>
-              <h3>{review.user}</h3>
-              <p>{review.comment}</p>
-              <p>Rating: {review.rating}</p>
-            </div>
-          ))}
-        </div>
+      <section className="restaurant-section">
+        <h2>Location Details</h2>
+        <p><strong>Address:</strong> {placeDetails.formatted_address}</p>
+        <p><strong>Rating:</strong> {placeDetails.rating} ⭐</p>
+        <p><strong>Price Level:</strong> {"$".repeat(placeDetails.price_level || 0)}</p>
 
-        <form onSubmit={handleSubmit}>
-          <label>
-            Rating:
-            <select value={rating} onChange={e => setRating(+e.target.value)}>  
-              <option value={1}>1</option>
-              <option value={2}>2</option>
-              <option value={3}>3</option>
-              <option value={4}>4</option>
-              <option value={5}>5</option>
-            </select>
-          </label>
-          <br/>
-          <label>
-            Comment:
-            <textarea value={comment} onChange={e => setComment(e.target.value)} />
-          </label>
-          <br/>
-          <button type="submit">Post Review</button>
-        </form>
+        {placeDetails.opening_hours?.weekday_text && (
+          <div>
+            <strong>Hours:</strong>
+            <ul>
+              {placeDetails.opening_hours.weekday_text.map((day, idx) => (
+                <li key={idx}>{day}</li>
+              ))}
+            </ul>
+          </div>
+        )}
+
+        {placeDetails.website && (
+          <p>
+            <strong>Website:</strong>{" "}
+            <a href={placeDetails.website} target="_blank" rel="noopener noreferrer" className="text-blue-500 underline">
+              {placeDetails.website}
+            </a>
+          </p>
+        )}
       </section>
 
+      <section className="restaurant-reviews-section">
+        <h2>Google Reviews</h2>
+        {placeDetails.reviews && placeDetails.reviews.length > 0 ? (
+          placeDetails.reviews.map((review, idx) => (
+            <div key={idx} className="review-card">
+              <h3>{review.author_name}</h3>
+              <p>{review.text}</p>
+              <p>Rating: {review.rating}</p>
+            </div>
+          ))
+        ) : (
+          <p>No reviews available.</p>
+        )}
+      </section>
     </div>
   );
 }
-
-
-
