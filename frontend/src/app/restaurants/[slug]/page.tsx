@@ -1,10 +1,12 @@
 'use client';
+
 import React, { useEffect, useState, FormEvent } from "react";
 import { useSearchParams } from 'next/navigation';
 import { useAppContext } from "@/app/AppContext";
+import { getCookie } from 'typescript-cookie';
 import "./styles.css";
 
- declare global {
+declare global {
   interface Window {
     google: typeof google;
   }
@@ -14,15 +16,12 @@ interface PlaceDetails {
   formatted_address?: string;
   rating?: number;
   price_level?: number;
-  reviews?: {
-    author_name: string;
-    text: string;
-    rating: number;
-  }[];
+  reviews?: { 
+    author_name: string; 
+    text: string; rating: 
+    number; }[];
   photos?: google.maps.places.PlacePhoto[];
-  opening_hours?: {
-    weekday_text?: string[];
-  };
+  opening_hours?: { weekday_text?: string[] };
   website?: string;
   name?: string;
 }
@@ -44,6 +43,14 @@ export default function RestaurantPage() {
   const [rating, setRating] = useState(5);
   const [comment, setComment] = useState('');
   const [userReviews, setUserReviews] = useState<UserReview[]>([]);
+  const [isOpen, setIsOpen] = useState<boolean | null>(null);
+
+  const createSlug = (name: string) =>
+    name.trim().toLowerCase()
+      .replace(/[^\w\s-]/g, "")
+      .replace(/\s+/g, "-")
+      .replace(/--+/g, "-")
+      .replace(/-$/, "");
 
   useEffect(() => {
     if (!placeId || typeof window === "undefined" || !window.google?.maps) return;
@@ -61,8 +68,8 @@ export default function RestaurantPage() {
             rating: r.rating ?? 0
           })) || [],
           photos: place.photos || [],
-          opening_hours: {
-            weekday_text: place.opening_hours?.weekday_text || []
+          opening_hours: { 
+            weekday_text: place.opening_hours?.weekday_text || [] 
           },
           website: place.website || "",
           name: place.name || ""
@@ -73,97 +80,169 @@ export default function RestaurantPage() {
     });
   }, [placeId]);
 
-  const handleSubmitReview = (e: FormEvent) => {
-    e.preventDefault();
-    const newReview: UserReview = {
-      user: user?.username || "Anonymous",
-      rating,
-      comment,
-      created_at: new Date().toISOString(),
+  useEffect(() => {
+    if (!placeDetails?.name) return;
+    const slug = createSlug(placeDetails.name);
+
+    fetch(`/restaurants/api/${slug}/reviews/`, { credentials: "include" })
+      .then(res => res.ok ? res.json() : Promise.reject())
+      .then(data => setUserReviews(data.reviews || []))
+      .catch(() => console.error("Failed to load user reviews"));
+  }, [placeDetails?.name]);
+
+  useEffect(() => {
+    if (!placeDetails?.opening_hours?.weekday_text) return;
+
+    const now = new Date();
+    const dayIndex = now.getDay();
+    const todayHours = placeDetails.opening_hours.weekday_text[dayIndex === 0 ? 6 : dayIndex - 1];
+    if (!todayHours) {
+      setIsOpen(null);
+      return;
+    }
+
+    const times = todayHours.match(/\d{1,2}(:\d{2})?\s[APMapm]{2}/g);
+    if (!times || times.length < 2) {
+      setIsOpen(null);
+      return;
+    }
+
+    const [openStr, closeStr] = times;
+    const parseTime = (str: string) => {
+      const [hourStr, minuteStr = "00"] = str.replace(/AM|PM/i, "").trim().split(":");
+      const ampm = str.slice(-2).toUpperCase();
+      let hour = parseInt(hourStr) % 12;
+      if (ampm === "PM") hour += 12;
+      return { hour, minute: parseInt(minuteStr) };
     };
-    setUserReviews((prev) => [newReview, ...prev]);
-    setRating(5);
-    setComment('');
+
+    const { hour: openHour, minute: openMin } = parseTime(openStr);
+    const { hour: closeHour, minute: closeMin } = parseTime(closeStr);
+
+    const openTime = new Date(now); openTime.setHours(openHour, openMin, 0, 0);
+    const closeTime = new Date(now); closeTime.setHours(closeHour, closeMin, 0, 0);
+
+    const nowTime = now.getTime();
+    setIsOpen(nowTime >= openTime.getTime() && nowTime <= closeTime.getTime());
+  }, [placeDetails]);
+
+  const handleSubmitReview = async (e: FormEvent) => {
+    e.preventDefault();
+    if (!placeDetails) return;
+
+    const slug = createSlug(placeDetails.name);
+    try {
+      const res = await fetch(`/restaurants/api/${slug}/create_review/`, {
+        method: "POST",
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+          "X-CSRFToken": getCookie('csrftoken') || ''
+        },
+        body: JSON.stringify({ rating, comment }),
+      });
+
+      if (res.ok) {
+        const newReview = await res.json();
+        setUserReviews(prev => [newReview, ...prev]);
+        setRating(5);
+        setComment('');
+      } else {
+        alert("Failed to submit review.");
+      }
+    } catch (err) {
+      console.error("Error posting review:", err);
+      alert("Error submitting your review.");
+    }
   };
 
-  if (error) return <div>Failed to load.</div>;
-  if (!placeDetails) return <div>Loading…</div>;
+  if (error) return <div>Failed to load restaurant.</div>;
+  if (!placeDetails) return <div>Loading...</div>;
+
+  const photoUrl = placeDetails.photos?.[0]?.getUrl() || "/placeholder.svg";
 
   return (
-    <div className="restaurant-details-page">
-      <h1 className="restaurant-title">{placeDetails.name}</h1>
-
-      <section className="restaurant-section">
-        <h2>Location Details</h2>
-        <p><strong>Address:</strong> {placeDetails.formatted_address}</p>
-        <p><strong>Rating:</strong> {placeDetails.rating} ⭐</p>
-        <p><strong>Price Level:</strong> {"$".repeat(placeDetails.price_level || 0)}</p>
-
-        {placeDetails.opening_hours?.weekday_text && (
-          <div>
-            <strong>Hours:</strong>
-            <ul>
-              {placeDetails.opening_hours.weekday_text.map((day, idx) => (
-                <li key={idx}>{day}</li>
-              ))}
-            </ul>
-          </div>
-        )}
-
-        {placeDetails.website && (
-          <p>
-            <strong>Website:</strong>{" "}
-            <a href={placeDetails.website} target="_blank" rel="noopener noreferrer" className="text-blue-500 underline">
-              {placeDetails.website}
-            </a>
-          </p>
-        )}
-      </section>
+    <div className="restaurant-page-wrapper">
+      <div className="restaurant-header">
+        <div className="restaurant-info">
+          <h1>{placeDetails.name}</h1>
+          <p><strong>Address:</strong> {placeDetails.formatted_address}</p>
+          <p><strong>Rating:</strong> {placeDetails.rating} ⭐</p>
+          <p><strong>Price Level:</strong> {"$".repeat(placeDetails.price_level || 0)}</p>
+          {isOpen !== null && (
+            <p className={`open-status ${isOpen ? "open" : "closed"}`}>
+              {isOpen ? "Open Now" : "Closed"}
+            </p>
+          )}
+          {placeDetails.opening_hours?.weekday_text && (
+            <div className="restaurant-hours">
+              <strong>Hours:</strong>
+              <ul>
+                {placeDetails.opening_hours.weekday_text.map((day, idx) => (
+                  <li key={idx}>{day}</li>
+                ))}
+              </ul>
+            </div>
+          )}
+          {placeDetails.website && (
+            <p><strong>Website:</strong> <a href={placeDetails.website} target="_blank" className="restaurant-website">{placeDetails.website}</a></p>
+          )}
+        </div>
+        <div className="restaurant-photo">
+          <img src={photoUrl} alt="Restaurant" />
+        </div>
+      </div>
 
       <section className="restaurant-reviews-section">
-        <h2>Google Reviews</h2>
-        {placeDetails.reviews && placeDetails.reviews.length > 0 ? (
-          placeDetails.reviews.map((review, idx) => (
-            <div key={idx} className="review-card">
+        <h2>Reviews</h2>
+        <div className="google-reviews-scroll">
+          {placeDetails.reviews?.length ? placeDetails.reviews.map((review, idx) => (
+            <div key={idx} className="google-review-card">
               <h3>{review.author_name}</h3>
               <p>{review.text}</p>
-              <p>Rating: {review.rating}</p>
+              <p>Rating: {review.rating} ⭐</p>
             </div>
-          ))
-        ) : (
-          <p>No reviews available.</p>
-        )}
+          )) : (
+            <p>No Google reviews available.</p>
+          )}
+        </div>
       </section>
 
       <section className="user-reviews-section">
         <h2>Leave Your Review</h2>
-
-        <form onSubmit={handleSubmitReview}>
-          <label>
-            Rating:
-            <select value={rating} onChange={(e) => setRating(+e.target.value)}>
+        <form onSubmit={handleSubmitReview} className="review-form">
+          <div className="form-group">
+            <label>Rating:</label>
+            <div className="star-rating">
               {[1, 2, 3, 4, 5].map((n) => (
-                <option key={n} value={n}>{n}</option>
+                <span key={n} className={`star ${n <= rating ? "filled" : ""}`} onClick={() => setRating(n)}>★</span>
               ))}
-            </select>
-          </label>
-          <br />
-          <label>
-            Comment:
-            <textarea value={comment} onChange={(e) => setComment(e.target.value)} />
-          </label>
-          <br />
+            </div>
+          </div>
+          <div className="form-group">
+            <label>Comment:</label>
+            <textarea
+              className="form-textarea"
+              value={comment}
+              onChange={(e) => setComment(e.target.value)}
+            />
+          </div>
           <button type="submit" className="submit-review-button">Post Review</button>
         </form>
 
+        <h2>WorkBreak User Reviews</h2>
         <div className="user-reviews-list">
-          {userReviews.map((review, idx) => (
-            <div key={idx} className="review-card">
-              <h3>{review.user}</h3>
-              <p>{review.comment}</p>
-              <p>Rating: {review.rating}</p>
-            </div>
-          ))}
+          {userReviews.length === 0 ? (
+            <p>No reviews yet. Be the first!</p>
+          ) : (
+            userReviews.map((review, idx) => (
+              <div key={idx} className="user-review-card">
+                <h3>{review.user}</h3>
+                <p>{review.comment}</p>
+                <p>Rating: {review.rating} ⭐</p>
+              </div>
+            ))
+          )}
         </div>
       </section>
     </div>

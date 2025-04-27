@@ -3,9 +3,6 @@
 import { useEffect, useState } from "react";
 import FilterForm from "@/app/components/map/FilterForm";
 import { useAppContext } from "@/app/AppContext";
-import Image from "next/image";
-import { useRouter } from "next/navigation";
-import { Star, Eye } from "lucide-react";
 import "./styles.css";
 
 export interface Restaurant {
@@ -23,9 +20,8 @@ export interface Restaurant {
 export default function DiscoverPage() {
   const { googleMapsLibrary } = useAppContext();
   const [coords, setCoords] = useState({ lat: 0, lng: 0 });
-  const [restaurants, setRestaurants] = useState<Restaurant[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const router = useRouter();
+  const [, setRestaurants] = useState<Restaurant[]>([]);
+  const [, setIsLoading] = useState(true);
 
   useEffect(() => {
     if (!navigator.geolocation) {
@@ -35,9 +31,11 @@ export default function DiscoverPage() {
     navigator.geolocation.getCurrentPosition(
       (position) => {
         setCoords({ lat: position.coords.latitude, lng: position.coords.longitude });
+        setIsLoading(false);
       },
       (err) => {
         console.error("Error getting location:", err);
+        setIsLoading(false);
       },
       { enableHighAccuracy: true, timeout: 5000, maximumAge: 0 }
     );
@@ -45,11 +43,7 @@ export default function DiscoverPage() {
 
   const handleRestaurantsFound = (results: Restaurant[]) => {
     setRestaurants(results);
-    setIsLoading(false);
   };
-
-  const createSlug = (name: string) =>
-    name.toLowerCase().replace(/[^\w\s-]/g, "").replace(/\s+/g, "-").replace(/--+/g, "-");
 
   return (
     <div className="discover-page">
@@ -57,82 +51,17 @@ export default function DiscoverPage() {
         <div className="discover-container">
           <h1 className="discover-title">Discover Restaurants</h1>
 
-          {googleMapsLibrary && (
+          {googleMapsLibrary ? (
             <div className="filter-form-wrapper">
-              <FilterForm destination={coords} onResultsFound={handleRestaurantsFound} setIsLoading={setIsLoading} />
+              <FilterForm
+                destination={coords}
+                onResultsFound={handleRestaurantsFound}
+                setIsLoading={setIsLoading}
+              />
             </div>
+          ) : (
+            <p>Loading Google Maps library...</p>
           )}
-
-          <div className="restaurants-section">
-            <h2 className="restaurants-heading">Restaurants Near You</h2>
-            {isLoading ? (
-              <div className="restaurants-grid">
-                {[...Array(6)].map((_, i) => (
-                  <div key={i} className="restaurant-card-loading"></div>
-                ))}
-              </div>
-            ) : restaurants.length === 0 ? (
-              <div className="restaurants-empty">
-                <p>No restaurants found matching your criteria.</p>
-                <p>Try adjusting your filters or search in a different area.</p>
-              </div>
-            ) : (
-              <div className="restaurants-grid">
-                {restaurants.map((restaurant) => {
-                  const slug = createSlug(restaurant.name);
-                  const photoUrl = restaurant.photos?.[0]?.getUrl() || "/placeholder.svg?height=200&width=400";
-                  const cuisine =
-                    restaurant.types?.find(
-                      (type) => !["point_of_interest", "establishment", "food", "restaurant"].includes(type)
-                    ) || "Restaurant";
-
-                  return (
-                    <div key={restaurant.place_id} className="restaurant-card">
-                      <div className="restaurant-image-wrapper">
-                        <Image
-                          src={photoUrl}
-                          alt={restaurant.name}
-                          fill
-                          className="restaurant-image"
-                        />
-                      </div>
-
-                      <div className="restaurant-info">
-                        <h3 className="restaurant-name">{restaurant.name}</h3>
-                        <div className="restaurant-rating">
-                          {[...Array(5)].map((_, i) => (
-                            <Star
-                              key={i}
-                              size={16}
-                              fill={i < Math.floor(restaurant.rating || 0) ? "currentColor" : "none"}
-                              className={i < Math.floor(restaurant.rating || 0) ? "star-filled" : "star-empty"}
-                            />
-                          ))}
-                          <span className="rating-number">{restaurant.rating?.toFixed(1) || "N/A"}</span>
-                        </div>
-                        <p className="restaurant-cuisine">{cuisine}</p>
-                        <p className="restaurant-price-distance">
-                          {"$".repeat(restaurant.price_level || 0)} • {restaurant.distance || ""}
-                        </p>
-                        <p className="restaurant-location">{restaurant.vicinity || restaurant.formatted_address || ""}</p>
-                      </div>
-
-                      <div className="restaurant-view-button-wrapper">
-                        <button
-                          onClick={() => router.push(`/restaurants/${slug}?id=${restaurant.place_id}`)}
-                          className="restaurant-view-button"
-                          aria-label={`View details for ${restaurant.name}`}
-                        >
-                          <Eye size={16} className="mr-2" />
-                          View
-                        </button>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            )}
-          </div>
         </div>
       </main>
     </div>
