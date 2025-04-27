@@ -1,7 +1,6 @@
 "use client"
 
-import React, {useEffect} from "react"
-import { useState, useRef } from "react"
+import React, { useEffect, useState, useRef } from "react"
 import Image from "next/image"
 import { Camera, Check } from "lucide-react"
 import "./styles.css"
@@ -9,29 +8,37 @@ import {BACKEND_ENDPOINT, default_image_url, useAppContext, User} from "@/app/Ap
 import LogoutButton from "@/app/user/components/LogoutButton";
 
 const cuisineOptions = [
-    { id: "chinese", label: "Chinese" },
-    { id: "italian", label: "Italian" },
-    { id: "american", label: "American" },
-    { id: "mexican", label: "Mexican" },
-    { id: "indian", label: "Indian" },
-    { id: "japanese", label: "Japanese" },
-    { id: "thai", label: "Thai" },
-    { id: "mediterranean", label: "Mediterranean" },
+  { id: "chinese", label: "Chinese" },
+  { id: "italian", label: "Italian" },
+  { id: "american", label: "American" },
+  { id: "mexican", label: "Mexican" },
+  { id: "indian", label: "Indian" },
+  { id: "japanese", label: "Japanese" },
+  { id: "thai", label: "Thai" },
+  { id: "mediterranean", label: "Mediterranean" },
+]
+
+const budgetOptions = [
+  { value: "INEXPENSIVE", label: "Inexpensive" },
+  { value: "MODERATE", label: "Moderate" },
+  { value: "EXPENSIVE", label: "Expensive" },
+  { value: "VERY_EXPENSIVE", label: "Very Expensive" },
 ]
 
 export default function ProfilePage() {
-  const {user, setUser} = useAppContext()
-  const [newUser, setNewUser] = useState<User>(user);
+  const { user, setUser } = useAppContext()
+  const [newUser, setNewUser] = useState<User>(user)
+  const [preferredBudget, setPreferredBudget] = useState<string>("MODERATE") // Local state
   const [isEditing, setIsEditing] = useState(false)
   const [isSaving, setIsSaving] = useState(false)
   const [saveSuccess, setSaveSuccess] = useState(false)
-  const [errors, setErrors] = useState({"username":""});
+  const [errors, setErrors] = useState({ username: "" })
   const fileInputRef = useRef<HTMLInputElement>(null)
   const [newImage, setNewImage] = useState<File>();
   const { csrftoken } = useAppContext();
 
   useEffect(() => {
-    setNewUser(user);
+    setNewUser(user)
   }, [user])
 
   const handleImageClick = () => {
@@ -44,7 +51,7 @@ export default function ProfilePage() {
       setNewImage(file)
       const reader = new FileReader()
       reader.onload = (e) => {
-        if (e.target?.result) setNewUser({...newUser, image: e.target.result as string})
+        if (e.target?.result) setNewUser({ ...newUser, image: e.target.result as string })
       }
       reader.readAsDataURL(file)
     }
@@ -55,63 +62,62 @@ export default function ProfilePage() {
       const updatedCuisines = prev.cuisines.includes(cuisineId)
         ? prev.cuisines.filter((id) => id !== cuisineId)
         : [...prev.cuisines, cuisineId]
-      return {...prev, cuisines: updatedCuisines}
+      return { ...prev, cuisines: updatedCuisines }
     })
   }
 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault()
 
-    setIsSaving(true);
+    setIsSaving(true)
 
     const updateUserResponse = await fetch(`${BACKEND_ENDPOINT}/user/api/update_user`, {
-      method: 'POST',
+      method: "POST",
       headers: {
         'X-CSRFToken': csrftoken || '',
         'Content-type': 'application/json'
       },
-      body: JSON.stringify({"username":newUser.username}),
-      credentials: 'include',
-    });
+      body: JSON.stringify({ username: newUser.username }),
+      credentials: "include",
+    })
 
-
-    const form_data = new FormData();
+    const form_data = new FormData()
     if (newImage) {
-      form_data.append('image', newImage);
+      form_data.append("image", newImage)
     }
 
     form_data.append('cuisines', JSON.stringify(newUser.cuisines))
     form_data.append('budget', JSON.stringify(newUser.budget))
 
     const updateUserProfileResponse = await fetch(`${BACKEND_ENDPOINT}/user/api/update_profile`, {
-      method: 'POST',
+      method: "POST",
       headers: {
         'X-CSRFToken': csrftoken || '',
       },
       body: form_data,
-      credentials: 'include',
-    });
+      credentials: "include",
+    })
 
-    const updateUserData = await updateUserResponse.json();
-    const updateUserProfileData = await updateUserProfileResponse.json();
+    const updateUserData = await updateUserResponse.json()
+    const updateUserProfileData = await updateUserProfileResponse.json()
 
     if (updateUserResponse.ok && updateUserProfileResponse.ok) {
       setSaveSuccess(true)
       setTimeout(() => setSaveSuccess(false), 3000)
-      setIsEditing(false);
-      setUser(newUser);
-      setErrors({"username":""});
+      setIsEditing(false)
+      setUser(newUser)
+      setErrors({ username: "" })
     } else {
-      setErrors({...updateUserData, ...updateUserProfileData});
+      setErrors({ ...updateUserData, ...updateUserProfileData })
     }
 
-    setIsSaving(false);
+    setIsSaving(false)
   }
 
   const handleEdit = () => {
-    setNewUser(user);
-    setIsEditing(!isEditing);
-    setErrors({"username":""});
+    setNewUser(user)
+    setIsEditing(!isEditing)
+    setErrors({ username: "" })
   }
 
   if (user.is_restaurant) {
@@ -138,7 +144,8 @@ export default function ProfilePage() {
                 <div className="profile-details">
                   <div className="image-section">
                     <div className={`image-wrapper ${isEditing ? "editable" : ""}`} onClick={handleImageClick}>
-                      <Image src={newUser.image == "" ? default_image_url : newUser.image} fill alt="Profile" className="image" />
+                      <Image src={newUser.image === "" ? default_image_url : newUser.image} alt="Profile" fill className="image" />
+
                       {isEditing && (
                         <div className="image-overlay">
                           <Camera className="overlay-icon" size={32} />
@@ -165,12 +172,31 @@ export default function ProfilePage() {
                       <input
                         type="text"
                         id="username"
-                        onChange={(e) => setNewUser({...newUser, username: e.target.value})}
+                        onChange={(e) => setNewUser({ ...newUser, username: e.target.value })}
                         value={newUser.username}
                         className={`username-input ${isEditing ? "editable-input" : "readonly-input"}`}
                         disabled={!isEditing}
                       />
-                      {errors != null && errors["username"] && <p>{errors["username"]}</p>}
+                      {errors?.username && <p>{errors.username}</p>}
+                    </div>
+
+                    <div className="budget-group">
+                      <label htmlFor="budget" className="budget-label">
+                        Preferred Budget
+                      </label>
+                      <select
+                        id="budget"
+                        value={preferredBudget}
+                        onChange={(e) => setPreferredBudget(e.target.value)}
+                        className={`budget-select ${isEditing ? "editable-input" : "readonly-input"}`}
+                        disabled={!isEditing}
+                      >
+                        {budgetOptions.map((option) => (
+                          <option key={option.value} value={option.value}>
+                            {option.label}
+                          </option>
+                        ))}
+                      </select>
                     </div>
                   </div>
                 </div>
@@ -191,9 +217,7 @@ export default function ProfilePage() {
                       >
                         <div
                           className={`cuisine-check ${
-                            newUser.cuisines.includes(cuisine.id)
-                              ? "check-filled"
-                              : "check-empty"
+                            newUser.cuisines.includes(cuisine.id) ? "check-filled" : "check-empty"
                           }`}
                         >
                           {newUser.cuisines.includes(cuisine.id) && <Check size={14} />}
@@ -206,11 +230,7 @@ export default function ProfilePage() {
 
                 {isEditing && (
                   <div className="save-section">
-                    <button
-                      type="submit"
-                      className="save-button"
-                      disabled={isSaving}
-                    >
+                    <button type="submit" className="save-button" disabled={isSaving}>
                       {isSaving ? "Saving..." : "Save Changes"}
                     </button>
                   </div>
