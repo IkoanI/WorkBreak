@@ -5,12 +5,7 @@ import { useSearchParams } from 'next/navigation';
 import "./styles.css";
 import TripadvisorReviews from "@/app/components/tripadvisor/TripadvisorReviews";
 import {BACKEND_ENDPOINT, useAppContext} from "@/app/AppContext";
-
-declare global {
-  interface Window {
-    google: typeof google;
-  }
-}
+import Route from "@/app/components/map/Route";
 
 interface PlaceDetails {
   formatted_address?: string;
@@ -25,6 +20,7 @@ interface PlaceDetails {
   website?: string;
   name?: string;
   location?: google.maps.LatLng;
+  place_id?: string;
 }
 
 interface UserReview {
@@ -73,10 +69,10 @@ export default function RestaurantPage() {
           },
           website: place.website || "",
           name: place.name || "",
-          location: place.geometry?.location || new google.maps.LatLng(0, 0)
+          location: place.geometry?.location || new google.maps.LatLng(0, 0),
+          place_id: place.place_id || ""
         });
 
-        console.log(placeDetails);
       } else {
         setError(true);
       }
@@ -87,11 +83,11 @@ export default function RestaurantPage() {
     if (!placeDetails?.name) return;
     const slug = createSlug(placeDetails.name);
 
-    fetch(`${BACKEND_ENDPOINT}/restaurants/api/${slug}/reviews/`, { credentials: "include" })
+    fetch(`${BACKEND_ENDPOINT}/restaurants/api/${slug}/${placeId}/reviews/`, { credentials: "include" })
       .then(res => res.ok ? res.json() : Promise.reject())
       .then(data => setUserReviews(data.reviews || []))
       .catch(() => console.error("Failed to load user reviews"));
-  }, [placeDetails?.name]);
+  }, [placeDetails?.name, placeId]);
 
   useEffect(() => {
     if (!placeDetails?.opening_hours?.weekday_text) return;
@@ -212,6 +208,8 @@ export default function RestaurantPage() {
       </section>
 
       <TripadvisorReviews restaurant_name={placeDetails.name || ''} coords={{lat:placeDetails.location?.lat() || 0, lng:placeDetails.location?.lng() || 0}}/>
+
+      <Route placeId={placeDetails.place_id || ''}/>
 
       <section className="user-reviews-section">
         <h2>Leave Your Review</h2>
