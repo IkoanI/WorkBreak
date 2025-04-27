@@ -2,11 +2,9 @@
 
 import React, { useEffect, useState, FormEvent } from "react";
 import { useSearchParams } from 'next/navigation';
-// import { useAppContext } from "@/app/AppContext";
-import { getCookie } from 'typescript-cookie';
 import "./styles.css";
 import TripadvisorReviews from "@/app/components/tripadvisor/TripadvisorReviews";
-import {BACKEND_ENDPOINT} from "@/app/AppContext";
+import {BACKEND_ENDPOINT, useAppContext} from "@/app/AppContext";
 
 declare global {
   interface Window {
@@ -39,7 +37,7 @@ interface UserReview {
 export default function RestaurantPage() {
   const searchParams = useSearchParams();
   const placeId = searchParams.get("id");
-  // const { user } = useAppContext();
+  const { csrftoken } = useAppContext();
 
   const [placeDetails, setPlaceDetails] = useState<PlaceDetails | null>(null);
   const [error, setError] = useState(false);
@@ -89,7 +87,7 @@ export default function RestaurantPage() {
     if (!placeDetails?.name) return;
     const slug = createSlug(placeDetails.name);
 
-    fetch(`/restaurants/api/${slug}/reviews/`, { credentials: "include" })
+    fetch(`${BACKEND_ENDPOINT}/restaurants/api/${slug}/reviews/`, { credentials: "include" })
       .then(res => res.ok ? res.json() : Promise.reject())
       .then(data => setUserReviews(data.reviews || []))
       .catch(() => console.error("Failed to load user reviews"));
@@ -142,7 +140,7 @@ export default function RestaurantPage() {
         credentials: "include",
         headers: {
           "Content-Type": "application/json",
-          "X-CSRFToken": getCookie('csrftoken') || ''
+          "X-CSRFToken": csrftoken || ''
         },
         body: JSON.stringify({ rating, comment }),
       });
