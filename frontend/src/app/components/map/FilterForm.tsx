@@ -49,12 +49,9 @@ export default function FilterForm({
     e.preventDefault();
     setLocalIsLoading(true);
     if (setIsLoading) setIsLoading(true);
-
-    // We manually call SearchTiles-like logic here
-    // (In your real project SearchTiles is doing a nearby search with Maps API)
-    // Here, just trigger onResultsFound if available
+ 
     if (onResultsFound) {
-      onResultsFound([]); // TEMP: replace [] later with real search result if needed
+      onResultsFound([]);  
     }
 
     setLocalIsLoading(false);
@@ -125,8 +122,7 @@ export default function FilterForm({
         </div>
       </form>
 
-      {/* You still keep this like you originally had */}
-      <div>
+       <div>
         <SearchTiles position={destination} formData={formData} />
       </div>
     </div>
