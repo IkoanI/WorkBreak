@@ -24,14 +24,16 @@ export type User = {
     cuisines: string[];
     is_restaurant: boolean;
     restaurant_name: string;
+    budget: string;
 }
 
-export const defaultUser = {
+export const defaultUser: User = {
     username : "",
     image : "",
     cuisines : new Array<string>(),
     is_restaurant: false,
     restaurant_name: "",
+    budget: "INEXPENSIVE",
 }
 
 type AppContextType = {

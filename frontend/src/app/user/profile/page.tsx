@@ -81,6 +81,7 @@ export default function ProfilePage() {
     }
 
     form_data.append('cuisines', JSON.stringify(newUser.cuisines))
+    form_data.append('budget', JSON.stringify(newUser.budget))
 
     const updateUserProfileResponse = await fetch(`${BACKEND_ENDPOINT}/user/api/update_profile`, {
       method: 'POST',

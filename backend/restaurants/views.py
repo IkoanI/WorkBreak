@@ -48,8 +48,25 @@ def tripadvisor_search(request, name, lat, lng):
         return JsonResponse({"error": "TripAdvisor API key not configured"}, status=500)
 
     # TripAdvisor API endpoint
-    url = f'https://api.content.tripadvisor.com/api/v1/location/search'
-    params = {'key': api_key, 'searchQuery': name, 'latLong': f'{lat},{lng}'}
+    url = 'https://api.content.tripadvisor.com/api/v1/location/search'
+    params = {'key': api_key, 'searchQuery': name, 'latLong': f'{lat},{lng}', 'category' : 'restaurant'}
+    headers = {"accept": "application/json"}
+
+    try:
+        response = requests.get(url, params=params, headers=headers)
+        response.raise_for_status()
+        return JsonResponse(response.json(), status=200)
+    except requests.RequestException as e:
+        return JsonResponse({"error": str(e)}, status=401)
+
+def tripadvisor_reviews(request, location_id):
+    api_key = dotenv_values(".env.local")['TRIPADVISOR_API_KEY']
+    if not api_key:
+        return JsonResponse({"error": "TripAdvisor API key not configured"}, status=500)
+
+    # TripAdvisor API endpoint
+    url = f'https://api.content.tripadvisor.com/api/v1/location/{location_id}/reviews'
+    params = {'key': api_key,}
     headers = {"accept": "application/json"}
 
     try:

@@ -65,5 +65,6 @@ def check_auth(request):
             response['image'] = user_profile.image.url
 
         response['cuisines'] = user_profile.cuisines
+        response['budget'] = user_profile.budget
 
     return JsonResponse(response, status=200)

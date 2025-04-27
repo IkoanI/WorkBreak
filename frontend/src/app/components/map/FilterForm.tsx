@@ -41,7 +41,7 @@ export default function FilterForm({
   const [formData, setFormData] = useState<FormData>({
     cuisine: user.cuisines.join(" or "),
     distance: "1",
-    budget: "MODERATE",
+    budget: user.budget,
   });
   const [isLoading, setLocalIsLoading] = useState(false);
 
@@ -98,7 +98,6 @@ export default function FilterForm({
                 setFormData({ ...formData, budget: event.target.value })
               }
             >
-              <option value="">Select</option>
               <option value={googleMapsLibrary.priceLevel.INEXPENSIVE}>
                 Inexpensive
               </option>

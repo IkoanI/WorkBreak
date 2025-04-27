@@ -3,6 +3,7 @@ import React, { useEffect, useState, FormEvent } from "react";
 import { useSearchParams } from 'next/navigation';
 import { useAppContext } from "@/app/AppContext";
 import "./styles.css";
+import TripadvisorReviews from "@/app/components/tripadvisor/TripadvisorReviews";
  declare global {
   interface Window {
     google: typeof google;
@@ -67,6 +68,8 @@ export default function RestaurantPage() {
           name: place.name || "",
           location: place.geometry?.location || new google.maps.LatLng(0, 0)
         });
+
+        console.log(placeDetails);
       } else {
         setError(true);
       }
@@ -134,6 +137,8 @@ export default function RestaurantPage() {
           <p>No reviews available.</p>
         )}
       </section>
+
+      <TripadvisorReviews restaurant_name={placeDetails.name || ''} coords={{lat:placeDetails.location?.lat() || 0, lng:placeDetails.location?.lng() || 0}}/>
 
       <section className="user-reviews-section">
         <h2>Leave Your Review</h2>
