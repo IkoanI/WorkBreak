@@ -1,7 +1,14 @@
 'use client';
-import React, { useEffect, useState } from "react";
-import { useParams, useSearchParams } from 'next/navigation';
+import React, { useEffect, useState, FormEvent } from "react";
+import { useSearchParams } from 'next/navigation';
+import { useAppContext } from "@/app/AppContext";
 import "./styles.css";
+
+ declare global {
+  interface Window {
+    google: typeof google;
+  }
+}
 
 interface PlaceDetails {
   formatted_address?: string;
@@ -20,45 +27,64 @@ interface PlaceDetails {
   name?: string;
 }
 
+interface UserReview {
+  user: string;
+  rating: number;
+  comment: string;
+  created_at: string;
+}
+
 export default function RestaurantPage() {
-  const { slug } = useParams();  
   const searchParams = useSearchParams();
   const placeId = searchParams.get("id");
+  const { user } = useAppContext();
 
   const [placeDetails, setPlaceDetails] = useState<PlaceDetails | null>(null);
   const [error, setError] = useState(false);
+  const [rating, setRating] = useState(5);
+  const [comment, setComment] = useState('');
+  const [userReviews, setUserReviews] = useState<UserReview[]>([]);
 
   useEffect(() => {
-    if (!placeId || typeof window === "undefined" || !google?.maps) return;
+    if (!placeId || typeof window === "undefined" || !window.google?.maps) return;
 
-    const fetchPlaceDetails = () => {
-      const service = new google.maps.places.PlacesService(document.createElement("div"));
-      service.getDetails({ placeId }, (place, status) => {
-        if (status === google.maps.places.PlacesServiceStatus.OK && place) {
-          setPlaceDetails({
-            formatted_address: place.formatted_address || "",
-            rating: place.rating ?? 0,
-            price_level: place.price_level ?? 0,
-            reviews: place.reviews?.map((r) => ({
-              author_name: r.author_name,
-              text: r.text,
-              rating: r.rating ?? 0
-            })) || [],
-            photos: place.photos || [],
-            opening_hours: {
-              weekday_text: place.opening_hours?.weekday_text || []
-            },
-            website: place.website || "",
-            name: place.name || ""
-          });
-        } else {
-          setError(true);
-        }
-      });
-    };
-
-    fetchPlaceDetails();
+    const service = new window.google.maps.places.PlacesService(document.createElement("div"));
+    service.getDetails({ placeId }, (place, status) => {
+      if (status === window.google.maps.places.PlacesServiceStatus.OK && place) {
+        setPlaceDetails({
+          formatted_address: place.formatted_address || "",
+          rating: place.rating ?? 0,
+          price_level: place.price_level ?? 0,
+          reviews: place.reviews?.map((r) => ({
+            author_name: r.author_name,
+            text: r.text,
+            rating: r.rating ?? 0
+          })) || [],
+          photos: place.photos || [],
+          opening_hours: {
+            weekday_text: place.opening_hours?.weekday_text || []
+          },
+          website: place.website || "",
+          name: place.name || ""
+        });
+      } else {
+        setError(true);
+      }
+    });
   }, [placeId]);
+
+  const handleSubmitReview = (e: FormEvent) => {
+    e.preventDefault();
+    const newReview: UserReview = {
+      user: user?.username || "Anonymous",
+      rating,
+      comment,
+      created_at: new Date().toISOString(),
+    };
+    setUserReviews((prev) => [newReview, ...prev]);
+    setRating(5);
+    setComment('');
+  };
 
   if (error) return <div>Failed to load.</div>;
   if (!placeDetails) return <div>Loading…</div>;
@@ -107,6 +133,38 @@ export default function RestaurantPage() {
         ) : (
           <p>No reviews available.</p>
         )}
+      </section>
+
+      <section className="user-reviews-section">
+        <h2>Leave Your Review</h2>
+
+        <form onSubmit={handleSubmitReview}>
+          <label>
+            Rating:
+            <select value={rating} onChange={(e) => setRating(+e.target.value)}>
+              {[1, 2, 3, 4, 5].map((n) => (
+                <option key={n} value={n}>{n}</option>
+              ))}
+            </select>
+          </label>
+          <br />
+          <label>
+            Comment:
+            <textarea value={comment} onChange={(e) => setComment(e.target.value)} />
+          </label>
+          <br />
+          <button type="submit" className="submit-review-button">Post Review</button>
+        </form>
+
+        <div className="user-reviews-list">
+          {userReviews.map((review, idx) => (
+            <div key={idx} className="review-card">
+              <h3>{review.user}</h3>
+              <p>{review.comment}</p>
+              <p>Rating: {review.rating}</p>
+            </div>
+          ))}
+        </div>
       </section>
     </div>
   );

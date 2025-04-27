@@ -5,7 +5,7 @@ import Latlon from "geodesy/latlon-ellipsoidal-vincenty";
 import "../../globals.css";
 import Place = google.maps.places.Place;
 import { useAppContext } from "@/app/AppContext";
-import { useRouter } from "next/navigation"; // ✅ you need this to push pages
+import { useRouter } from "next/navigation"; 
 
 type Props = {
   position: { lat: number; lng: number };
@@ -16,14 +16,14 @@ function PlacesSearchTiles(data: Props) {
   const [results, setResults] = useState<Place[]>([]);
   const [loading, setLoading] = useState(false);
   const { googleMapsLibrary } = useAppContext();
-  const router = useRouter(); // ✅ initialize router
+  const router = useRouter(); 
 
   useEffect(() => {
     if (!googleMapsLibrary) return;
 
-    let cuisine = data.formData.cuisine ? `${data.formData.cuisine} food` : "food";
+    const cuisine = data.formData.cuisine ? `${data.formData.cuisine} food` : "food";
 
-    let budget =
+    const budget =
       data.formData.budget == null
         ? google.maps.places.PriceLevel.MODERATE
         : googleMapsLibrary.placesLibrary.PriceLevel[
@@ -71,8 +71,7 @@ function PlacesSearchTiles(data: Props) {
       .finally(() => setLoading(false));
   }, [data, googleMapsLibrary]);
 
-  // ✅ create the slug for restaurant name
-  const createSlug = (name: string) => {
+   const createSlug = (name: string) => {
     return name.toLowerCase().replace(/[^\w\s-]/g, "").replace(/\s+/g, "-").replace(/--+/g, "-");
   };
 
@@ -99,8 +98,7 @@ function PlacesSearchTiles(data: Props) {
               <p>{place.formattedAddress}</p>
               <p style={{ fontSize: "0.85rem", color: "#666" }}>{place.businessStatus}</p>
 
-              {/* ✅ View More button */}
-              <button
+               <button
                 onClick={() => {
                   const slug = createSlug(place.displayName || "restaurant");
                   router.push(`/restaurants/${slug}?id=${place.id}`);
