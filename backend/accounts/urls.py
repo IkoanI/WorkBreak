@@ -1,6 +1,7 @@
 from django.urls import path, include
 from . import views
 from django_nextjs.views import nextjs_page
+from django.contrib.auth import views as auth_views
 urlpatterns = [
     path('signup', nextjs_page(), name='accounts.signup'),
     path('api/signup', views.signup, name='accounts.api.signup'),

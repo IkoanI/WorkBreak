@@ -12,7 +12,8 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 
 from pathlib import Path
 import os
-from dotenv import load_dotenv
+from dotenv import load_dotenv, dotenv_values
+
 load_dotenv()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -195,4 +196,6 @@ EMAIL_HOST = "smtp.gmail.com"
 EMAIL_USE_TLS = True
 EMAIL_PORT = 587
 EMAIL_HOST_USER = "cs2340group3@gmail.com"
-EMAIL_HOST_PASSWORD = os.getenv("CS2340_Gmail_App_Password")
+EMAIL_HOST_PASSWORD = dotenv_values(".env.local")['CS2340_GMAIL_APP_PASSWORD']
+
+LOGIN_URL = "https://work-break.vercel.app/accounts/login"
