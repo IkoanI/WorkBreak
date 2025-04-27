@@ -80,7 +80,6 @@ export default function Search (data : Props) {
                 })
                 map.fitBounds(bounds);
             } else {
-                console.log("no results");
             }
         }
         search();

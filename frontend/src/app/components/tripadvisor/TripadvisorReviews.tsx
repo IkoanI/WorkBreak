@@ -24,8 +24,6 @@ export default function TripadvisorReviews(props: Props) {
     const [reviews, setReviews] = useState([]);
 
     useEffect(() => {
-        console.log(props.restaurant_name);
-        console.log(props.coords);
         async function findRestaurant() {
             const response = await fetch(`${BACKEND_ENDPOINT}/restaurants/api/tripadvisor_search/${props.restaurant_name}/${props.coords.lat}/${props.coords.lng}`, {
                 credentials: 'include',

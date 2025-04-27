@@ -76,7 +76,6 @@ export default function RestaurantPage() {
           location: place.geometry?.location || new google.maps.LatLng(0, 0)
         });
 
-        console.log(placeDetails);
       } else {
         setError(true);
       }
