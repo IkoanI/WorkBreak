@@ -6,6 +6,7 @@ import { useSearchParams } from 'next/navigation';
 import { getCookie } from 'typescript-cookie';
 import "./styles.css";
 import TripadvisorReviews from "@/app/components/tripadvisor/TripadvisorReviews";
+import {BACKEND_ENDPOINT} from "@/app/AppContext";
 
 declare global {
   interface Window {
@@ -136,7 +137,7 @@ export default function RestaurantPage() {
 
     const slug = createSlug(placeDetails.name || '');
     try {
-      const res = await fetch(`/restaurants/api/${slug}/create_review/`, {
+      const res = await fetch(`${BACKEND_ENDPOINT}/restaurants/api/${slug}/create_review/`, {
         method: "POST",
         credentials: "include",
         headers: {

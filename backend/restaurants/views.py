@@ -36,6 +36,7 @@ def get_reviews(request, slug):
 def create_review(request, slug):
     if request.method == 'POST':
         data = json.loads(request.body)
+
         restaurant, _ = Restaurant.objects.get_or_create(
             slug=slug,
             defaults={"name": slug.replace("-", " ").title(), "description": "Auto-generated restaurant."}
@@ -92,5 +93,3 @@ def tripadvisor_reviews(request, location_id):
         return JsonResponse(response.json(), status=200)
     except requests.RequestException as e:
         return JsonResponse({"error": str(e)}, status=401)
-
-    return JsonResponse({'error': 'Invalid request method.'}, status=405)
