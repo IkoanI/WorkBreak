@@ -64,7 +64,8 @@ export default function RestaurantPage() {
             weekday_text: place.opening_hours?.weekday_text || []
           },
           website: place.website || "",
-          name: place.name || ""
+          name: place.name || "",
+          location: place.geometry?.location || new google.maps.LatLng(0, 0)
         });
       } else {
         setError(true);
