@@ -30,6 +30,14 @@ interface UserReview {
   created_at: string;
 }
 
+export function createSlug(name : string) {
+  return name.trim().toLowerCase()
+    .replace(/[^\w\s-]/g, "")
+    .replace(/\s+/g, "-")
+    .replace(/--+/g, "-")
+    .replace(/-$/, "");
+}
+
 export default function RestaurantPage() {
   const searchParams = useSearchParams();
   const placeId = searchParams.get("id");
@@ -41,13 +49,6 @@ export default function RestaurantPage() {
   const [comment, setComment] = useState('');
   const [userReviews, setUserReviews] = useState<UserReview[]>([]);
   const [isOpen, setIsOpen] = useState<boolean | null>(null);
-
-  const createSlug = (name: string) =>
-    name.trim().toLowerCase()
-      .replace(/[^\w\s-]/g, "")
-      .replace(/\s+/g, "-")
-      .replace(/--+/g, "-")
-      .replace(/-$/, "");
 
   useEffect(() => {
     if (!placeId || typeof window === "undefined" || !window.google?.maps) return;
@@ -76,6 +77,8 @@ export default function RestaurantPage() {
       } else {
         setError(true);
       }
+      
+
     });
   }, [placeId]);
 
@@ -87,7 +90,18 @@ export default function RestaurantPage() {
       .then(res => res.ok ? res.json() : Promise.reject())
       .then(data => setUserReviews(data.reviews || []))
       .catch(() => console.error("Failed to load user reviews"));
-  }, [placeDetails?.name, placeId]);
+    
+    fetch(`${BACKEND_ENDPOINT}/user/api/add_history`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRFToken': csrftoken || '',
+      },
+      body: JSON.stringify({"place_id": placeDetails.place_id, "slug": slug, "restaurant_name": placeDetails.name}),
+      credentials: 'include',
+    }).catch(() => console.error("Failed to add history"));
+    
+  }, [csrftoken, placeDetails?.name, placeDetails?.place_id, placeId]);
 
   useEffect(() => {
     if (!placeDetails?.opening_hours?.weekday_text) return;

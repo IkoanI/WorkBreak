@@ -6,6 +6,7 @@ import { Camera, Check } from "lucide-react"
 import "./styles.css"
 import {BACKEND_ENDPOINT, default_image_url, useAppContext, User} from "@/app/AppContext";
 import LogoutButton from "@/app/user/components/LogoutButton";
+import UserHistory from "@/app/user/components/UserHistory";
 
 const cuisineOptions = [
   { id: "chinese", label: "Chinese" },
@@ -242,6 +243,8 @@ export default function ProfilePage() {
                   </div>
                 )}
               </form>
+
+              <UserHistory />
               <LogoutButton />
             </div>
           </div>

@@ -17,6 +17,7 @@ class UserProfile(models.Model):
     image = models.ImageField(default="workbreak.png", upload_to=get_upload_path, blank=True)
     cuisines = models.JSONField(default=list, blank=True)
     budget = models.CharField(max_length=255, blank=False, default="INEXPENSIVE")
+    history = models.JSONField(default=list, blank=True)
 
     def __str__(self):
         return self.user.username + " Profile"
@@ -29,6 +30,7 @@ class RestaurantProfile(models.Model):
 
     def __str__(self):
         return self.user.username + " Profile"
+
 
 @receiver(post_save, sender=WorkBreakUser)  # new
 def create_or_update_user_profile(sender, instance, created, **kwargs):

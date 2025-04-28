@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import Latlon from "geodesy/latlon-ellipsoidal-vincenty";
-import Link from "next/link";  
+import Link from "next/link";
 import "../../globals.css";
 import { useAppContext } from "@/app/AppContext";
 
@@ -122,6 +122,7 @@ export default function PlacesSearchTiles({ position, formData }: Props) {
                 <p style={{ fontSize: "0.85rem", color: "#666" }}>{place.businessStatus}</p>
 
                 <div style={styles.buttonWrapper}>
+                  
                   <Link
                     href={`/restaurants/${createSlug(place.displayName || "restaurant")}?id=${place.id}`}
                     style={styles.viewMoreButton}
