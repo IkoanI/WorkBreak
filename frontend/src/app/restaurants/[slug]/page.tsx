@@ -30,13 +30,7 @@ interface UserReview {
   created_at: string;
 }
 
-export function createSlug(name : string) {
-  return name.trim().toLowerCase()
-    .replace(/[^\w\s-]/g, "")
-    .replace(/\s+/g, "-")
-    .replace(/--+/g, "-")
-    .replace(/-$/, "");
-}
+
 
 export default function RestaurantPage() {
   const searchParams = useSearchParams();
@@ -49,6 +43,13 @@ export default function RestaurantPage() {
   const [comment, setComment] = useState('');
   const [userReviews, setUserReviews] = useState<UserReview[]>([]);
   const [isOpen, setIsOpen] = useState<boolean | null>(null);
+
+  const createSlug = (name : string) =>
+      name.trim().toLowerCase()
+      .replace(/[^\w\s-]/g, "")
+      .replace(/\s+/g, "-")
+      .replace(/--+/g, "-")
+      .replace(/-$/, "");
 
   useEffect(() => {
     if (!placeId || typeof window === "undefined" || !window.google?.maps) return;
@@ -97,7 +98,7 @@ export default function RestaurantPage() {
         'Content-Type': 'application/json',
         'X-CSRFToken': csrftoken || '',
       },
-      body: JSON.stringify({"place_id": placeDetails.place_id, "slug": slug, "restaurant_name": placeDetails.name}),
+      body: JSON.stringify({"place_id": placeDetails.place_id, "slug": slug, "restaurant_name": placeDetails.name, "place_type": "restaurant"}),
       credentials: 'include',
     }).catch(() => console.error("Failed to add history"));
     
