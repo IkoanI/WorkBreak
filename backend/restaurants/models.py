@@ -10,6 +10,7 @@ class UserReview(models.Model):
     restaurant_name = models.CharField(max_length=255)
     rating = models.IntegerField(choices=[(i, i) for i in range(1, 6)])  
     comment = models.TextField(blank=True)
+    reply = models.TextField(blank=True, null=True)    # ← new field
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
