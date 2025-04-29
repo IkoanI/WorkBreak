@@ -1,0 +1,1 @@
+WorkBreak is a web application that helps users find nearby restaurants based on their cuisine preferences, distance, and budget. Users can view restaurant details, leave and edit reviews, and manage their profiles. The app is built with Next.js and Django, and integrates the Google Places API, Google Maps API, and TripAdvisor API for restaurant data and location services.
