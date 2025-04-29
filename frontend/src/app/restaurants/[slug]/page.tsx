@@ -355,7 +355,10 @@ export default function RestaurantPage() {
                 <p>Rating: {rev.rating} ⭐</p>
 
                 {rev.user === user?.username && !showEditBox[rev.id] &&
-                  <button onClick={() => setShowEditBox((prev) => ({...prev, [rev.id]: true}))}>Edit</button>
+                  <button onClick={() => setShowEditBox((prev) => ({...prev, [rev.id]: true}))}
+                          className="submit-review-button"
+                  >Edit
+                  </button>
                 }
                 {showEditBox[rev.id] &&
                 <div>
@@ -363,7 +366,8 @@ export default function RestaurantPage() {
                             placeholder="Edit your review..."
                             onChange={(e) => setEditText(() => ({...editText, [rev.id]: e.target.value}))}
                             value={editText[rev.id] || ""} />
-                  <button onClick={() => handleEditSubmit(rev.id)}>Submit</button>
+                  <br/>
+                  <button onClick={() => handleEditSubmit(rev.id)} className="submit-review-button">Submit</button>
                 </div>}
 
                 {rev.reply && (
@@ -380,6 +384,7 @@ export default function RestaurantPage() {
                         onClick={() =>
                           setShowReplyBox((s) => ({ ...s, [rev.id]: true }))
                         }
+                        className="submit-review-button"
                       >
                         Reply
                       </button>
@@ -395,7 +400,8 @@ export default function RestaurantPage() {
                           }
                           placeholder="Write your reply…"
                         />
-                        <button onClick={() => handleReplySubmit(rev.id)}>
+                        <br/>
+                        <button onClick={() => handleReplySubmit(rev.id)} className="submit-review-button">
                           Submit Reply
                         </button>
                       </div>
