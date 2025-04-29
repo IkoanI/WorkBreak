@@ -5,6 +5,7 @@ from . import views
 urlpatterns = [
     path("<slug:slug>/", nextjs_page(), name="restaurants.page"),
     path("discover/", nextjs_page(), name="restaurants.discover"),
+    path("api/edit_review/", views.edit_review, name="restaurants.api.edit_review"),
     path("api/<slug:slug>/", views.get_restaurant, name="restaurants.api.get_restaurant"),
     path("api/<slug:slug>/create_review/", views.create_review, name="restaurants.api.create_review"),
     path("api/<slug:slug>/<str:place_id>/reviews/", views.get_reviews, name="restaurants.api.get_reviews"),

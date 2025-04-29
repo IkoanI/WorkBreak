@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useState, FormEvent } from "react";
-import { useSearchParams } from 'next/navigation';
+import {redirect, useSearchParams} from 'next/navigation';
 import "./styles.css";
 import TripadvisorReviews from "@/app/components/tripadvisor/TripadvisorReviews";
 import {BACKEND_ENDPOINT, useAppContext} from "@/app/AppContext";
@@ -29,8 +29,6 @@ interface UserReview {
   reply?: string;
 }
 
-
-
 export default function RestaurantPage() {
   const searchParams = useSearchParams();
   const placeId = searchParams.get("id");
@@ -44,6 +42,8 @@ export default function RestaurantPage() {
   const [isOpen, setIsOpen] = useState<boolean | null>(null);
   const [replyContent, setReplyContent] = useState<Record<number,string>>({});
   const [showReplyBox, setShowReplyBox] = useState<Record<number,boolean>>({});
+  const [showEditBox, setShowEditBox] = useState(false);
+  const [editText, setEditText] = useState("");
 
   const createSlug = (name: string) =>
     name.trim().toLowerCase()
@@ -205,6 +205,33 @@ export default function RestaurantPage() {
     }
   };
 
+  const handleEditSubmit = async (id:number) => {
+    const response = await fetch(`${BACKEND_ENDPOINT}/restaurants/api/edit_review/`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRFToken': csrftoken || ''
+      },
+      body: JSON.stringify({ "id": id, "comment" : editText }),
+      credentials: 'include',
+    });
+
+    if (response.ok) {
+      setEditText("")
+      setShowEditBox(false)
+      setUserReviews((prev) =>
+        prev.map((r) =>
+          r.id === id
+            ? {
+                ...r,
+                comment: editText,
+              }
+            : r
+        )
+      );
+    }
+  };
+
   if (error) return <div>Failed to load restaurant.</div>;
   if (!placeDetails) return <div>Loading...</div>;
 
@@ -324,6 +351,13 @@ export default function RestaurantPage() {
                 <h3>{rev.user}</h3>
                 <p>{rev.comment}</p>
                 <p>Rating: {rev.rating} ⭐</p>
+
+                <button onClick={() => setShowEditBox(true)}>Edit</button>
+                {showEditBox &&
+                <div>
+                  <textarea name="edit_text" placeholder="Edit your review..." onChange={(e) => setEditText(e.target.value)} value={editText}/>
+                  <button onClick={() => handleEditSubmit(rev.id)}>Submit</button>
+                </div>}
 
                 {rev.reply && (
                   <div className="review-reply">

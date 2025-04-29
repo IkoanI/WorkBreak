@@ -84,6 +84,18 @@ def create_review(request, slug):
         "reply": user_review.reply,
     }, status=200)
 
+@login_required
+@require_POST
+def edit_review(request):
+    data = json.loads(request.body)
+    review = get_object_or_404(UserReview, id=data['id'])
+    if request.user != review.user:
+        return JsonResponse({"error": "You cannot edit this review."}, status=403)
+
+    review.comment = data["comment"]
+    review.save()
+    return JsonResponse({"message":"Review updated successfully"}, status=200)
+
 
 @login_required
 @require_POST

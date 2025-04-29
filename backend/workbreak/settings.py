@@ -156,7 +156,7 @@ CORS_ALLOWED_ORIGINS = [
     "https://127.0.0.1:3000",
     "https://127.0.0.1:8000",
     "https://work-break.vercel.app",
-    "https://work-break-git-staging-ikoanis-projects.vercel.app"
+    "https://work-break-git-staging-ikoanis-projects.vercel.app",
     "https://workbreak.pythonanywhere.com"
 ]
 

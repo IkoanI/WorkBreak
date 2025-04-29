@@ -6,6 +6,7 @@ from accounts.models import WorkBreakUser
 
 # Create your models here.
 class UserReview(models.Model):
+    id = models.AutoField(primary_key=True)
     user = models.ForeignKey(WorkBreakUser, on_delete=models.CASCADE, related_name='reviews')
     restaurant_name = models.CharField(max_length=255)
     rating = models.IntegerField(choices=[(i, i) for i in range(1, 6)])  
