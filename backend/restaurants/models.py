@@ -6,10 +6,12 @@ from accounts.models import WorkBreakUser
 
 # Create your models here.
 class UserReview(models.Model):
+    id = models.AutoField(primary_key=True)
     user = models.ForeignKey(WorkBreakUser, on_delete=models.CASCADE, related_name='reviews')
     restaurant_name = models.CharField(max_length=255)
     rating = models.IntegerField(choices=[(i, i) for i in range(1, 6)])  
     comment = models.TextField(blank=True)
+    reply = models.TextField(blank=True, null=True)    # ← new field
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):

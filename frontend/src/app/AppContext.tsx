@@ -80,6 +80,7 @@ export const ContextProvider = ({ children }: ContextProviderProps) => {
             if (data.image) {
                 data.image = `${BACKEND_ENDPOINT}/${data.image}`
             }
+
             setUser({...defaultUser, ...data,});
             if (!isAuthenticated) {
                 setIsAuthenticated(true);
