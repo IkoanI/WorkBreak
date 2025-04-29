@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useState, FormEvent } from "react";
-import {redirect, useSearchParams} from 'next/navigation';
+import { useSearchParams} from 'next/navigation';
 import "./styles.css";
 import TripadvisorReviews from "@/app/components/tripadvisor/TripadvisorReviews";
 import {BACKEND_ENDPOINT, useAppContext} from "@/app/AppContext";
@@ -42,8 +42,9 @@ export default function RestaurantPage() {
   const [isOpen, setIsOpen] = useState<boolean | null>(null);
   const [replyContent, setReplyContent] = useState<Record<number,string>>({});
   const [showReplyBox, setShowReplyBox] = useState<Record<number,boolean>>({});
-  const [showEditBox, setShowEditBox] = useState(false);
-  const [editText, setEditText] = useState("");
+
+  const [showEditBox, setShowEditBox] = useState<Record<number,boolean>>({});
+  const [editText, setEditText] = useState<Record<number,string>>({});
 
   const createSlug = (name: string) =>
     name.trim().toLowerCase()
@@ -206,29 +207,30 @@ export default function RestaurantPage() {
   };
 
   const handleEditSubmit = async (id:number) => {
+    const text = editText[id];
     const response = await fetch(`${BACKEND_ENDPOINT}/restaurants/api/edit_review/`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         'X-CSRFToken': csrftoken || ''
       },
-      body: JSON.stringify({ "id": id, "comment" : editText }),
+      body: JSON.stringify({ "id": id, "comment" : text }),
       credentials: 'include',
     });
 
     if (response.ok) {
-      setEditText("")
-      setShowEditBox(false)
       setUserReviews((prev) =>
         prev.map((r) =>
           r.id === id
             ? {
                 ...r,
-                comment: editText,
+                comment: text,
               }
             : r
         )
       );
+      setEditText((prev)=>({...prev, [id]: ""}))
+      setShowEditBox((prev) => ({...prev, [id]: false}))
     }
   };
 
@@ -352,10 +354,15 @@ export default function RestaurantPage() {
                 <p>{rev.comment}</p>
                 <p>Rating: {rev.rating} ⭐</p>
 
-                <button onClick={() => setShowEditBox(true)}>Edit</button>
-                {showEditBox &&
+                {rev.user === user?.username && !showEditBox[rev.id] &&
+                  <button onClick={() => setShowEditBox((prev) => ({...prev, [rev.id]: true}))}>Edit</button>
+                }
+                {showEditBox[rev.id] &&
                 <div>
-                  <textarea name="edit_text" placeholder="Edit your review..." onChange={(e) => setEditText(e.target.value)} value={editText}/>
+                  <textarea name="edit_text"
+                            placeholder="Edit your review..."
+                            onChange={(e) => setEditText(() => ({...editText, [rev.id]: e.target.value}))}
+                            value={editText[rev.id] || ""} />
                   <button onClick={() => handleEditSubmit(rev.id)}>Submit</button>
                 </div>}
 
